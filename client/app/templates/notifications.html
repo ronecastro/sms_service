@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% set active_page = "notifications" %}
+
+
+{% block app_content %}
+    <script src="{{ url_for('static', filename='js/nService.js') }}"></script> 
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">{%if not current_user.is_authenticated %}
+        All Notifications{% else %}Your Configured Notifications {% endif %} </h1>
+    <p class="mb-4">Notifications are sent to the configurated person contact whenever 
+        the Rule evaluates to True.</p>
+    <script>
+        window.onload = function(){
+        {%for notification in notifications%}
+            var table = document.getElementById("dataTable");
+            var row = table.insertRow(table.rows.length);
+            '{% if current_user.is_authenticated %}'
+                var select = row.insertCell(0)
+                var id = row.insertCell(1)
+                var expiration = row.insertCell(2);
+                var pv = row.insertCell(3);
+                var rule = row.insertCell(4);
+                var limit = row.insertCell(5);
+                var subrule = row.insertCell(6);
+            '{%else%}'
+                var id = row.insertCell(0)
+                var expiration = row.insertCell(1);
+                var pv = row.insertCell(2);
+                var rule = row.insertCell(3);
+                var limit = row.insertCell(4);
+                var subrule = row.insertCell(5);
+            '{%endif%}'
+            var n = '{{notification.notification}}';
+            obj = toJson(n);
+            nCores = obj.notificationCores;
+
+            var len = obj.notificationCores.length;
+            //se tamanho da array de notificacoes <= 1
+            if (len == 1){
+                '{% if current_user.is_authenticated %}'
+                select.innerHTML = "<td><input name='checkbox[]' class='cb' type='checkbox' \
+                                    name='checkbox[]' value='{{notification.id}}' \
+                                    id='{{notification.id}}'>{%if current_user.username=='admin'%}\
+                                    id = {{notification.id}}{%endif%}</td>";
+                id.innerHTML = '{{notification.id}}';
+                //console.log(obj)
+                expiration.innerHTML = obj.expiration;
+                pv.innerHTML = obj.notificationCores[len-1].notificationCore0.pv;
+                rule.innerHTML = obj.notificationCores[len-1].notificationCore0.rule;
+                //console.log('notificationCores', obj.notificationCores[j]);
+                rule_ = obj.notificationCores[0].notificationCore0.rule;
+                if (rule_.includes('LL')){
+                    limit.innerHTML += 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
+                        'LU = ' + obj.notificationCores[0].notificationCore0['limitLU'] + '<br/>';
+                }
+                else{
+                    limit.innerHTML = 'L = ' + obj.notificationCores[0].notificationCore0.limit;
+                }
+                subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
+                '{%else%}'
+                id.innerHTML = '{{notification.id}}';
+                expiration.innerHTML = obj.expiration;
+                pv.innerHTML = obj.notificationCores[0].notificationCore0.pv;
+                rule.innerHTML = obj.notificationCores[0].notificationCore0.rule;
+                //console.log('notificationCores', obj.notificationCores[0]);
+                rule_ = obj.notificationCores[0].notificationCore0.rule;
+                if (rule_.includes('LL')){
+                    limit.innerHTML += 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
+                        'LU = ' + obj.notificationCores[0].notificationCore0['limitLU'] + '<br/>';
+                }
+                else{
+                    limit.innerHTML = 'L = ' + obj.notificationCores[0].notificationCore0.limit;
+                }
+                subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
+                '{%endif%}'
+            }
+            //se tamanho da array de notificações > 1
+            else {
+                for (var j=0; j < len; j+=1){
+                    var nC = 'notificationCore' + j;
+                    if (j > 0){
+                        var nL = 'limit';
+                    }
+                    else {
+                        var nL = 'limit';
+                    }
+                    //console.log('nC', nC);
+                    var notification = obj.notificationCores[j][nC];
+                    var notification_str = JSON.stringify(notification);
+                    //console.log('notification', notification);
+                    if (typeof notification_str == 'string'){
+                        if (notification_str.includes('limitLL')){
+                            if (j > 0){
+                                var nL = 'limitLL';
+                            }
+                            else {
+                                var nL = 'limit';
+                            }
+                            //console.log('contains LL', nL);
+                        }
+                        else{
+                            //console.log('do not contains LL', nL);
+                        }
+                    }
+                    nC = 'notificationCore' + j;
+                    if(j == 0){
+                        nP = 'pv';
+                        nR = 'rule';
+                        nLimit = 'limit';
+                        nLimitLL = 'limitLL';
+                        nLimitLU = 'limitLU';
+                        nSubrule = 'subrule';
+                    }
+                    else{
+                        nP = 'pv' + j;
+                        nR = 'rule' + j;
+                        nLimit = 'limit' + j;
+                        nLimitLL = 'limitLL' + j;
+                        nLimitLU = 'limitLU' + j;
+                        nSubrule = 'subrule' + j;
+                    }
+                    '{% if current_user.is_authenticated %}'
+                    select.innerHTML = "<td><input name='checkbox[]' class='cb' type='checkbox' \
+                                        name='checkbox[]' value='{{notification.id}}' \
+                                        id='{{notification.id}}'>{%if current_user.username=='admin'%}\
+                                        id = {{notification.id}}{%endif%}</td>";
+                    id.innerHTML = '{{notification.id}}';
+                    expiration.innerHTML = obj.expiration;
+                    pv.innerHTML += obj.notificationCores[j][nC][nP] + '<br/>';
+                    rule.innerHTML += obj.notificationCores[j][nC][nR] + '<br/>';
+                    if (nL == 'limitLL'){
+                        limit.innerHTML += 'LL = ' + obj.notificationCores[j][nC][nLimitLL] + ' // ' +
+                            'LU = ' + obj.notificationCores[j][nC][nLimitLU] + '<br/>';
+                    }
+                    else{
+                        limit.innerHTML += 'L = ' + obj.notificationCores[j][nC][nLimit] + '<br/>';
+                    }
+                    subrule.innerHTML += obj.notificationCores[j][nC][nSubrule] + '<br/>';
+                    '{%else%}'
+                    id.innerHTML = '{{notification.id}}';
+                    expiration.innerHTML = obj.expiration;
+                    pv.innerHTML += obj.notificationCores[j][nC][nP] + '<br/>';
+                    rule.innerHTML += obj.notificationCores[j][nC][nR] + '<br/>';
+                    if (nL == 'limitLL'){
+                        limit.innerHTML += 'LL = ' + obj.notificationCores[j][nC][nLimitLL] + ' // ' +
+                            'LU = ' + obj.notificationCores[j][nC][nLimitLU] + '<br/>';
+                    }
+                    else{
+                        limit.innerHTML += 'L = ' + obj.notificationCores[j][nC][nLimit] + '<br/>';
+                    }
+                    subrule.innerHTML += obj.notificationCores[j][nC][nSubrule] + '<br/>';
+                    '{%endif%}'
+                }
+            }
+        {%endfor%}
+        //console.log(limit)
+        }
+    </script>
+    <!-- DataTales Example -->
+    <form action="" action='{{url_for("notifications")}}' method="POST" style="display:inline-block;overflow-x:auto;">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered table-sm text-left text-nowrap" id="dataTable" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                {% if current_user.is_authenticated %}
+                                <th>Select</th>
+                                {%endif%}
+                                <th>ID</th>
+                                <th>Expiration</th>
+                                <th>PV</th>
+                                <th>Rule</th>
+                                <th>Limit</th>
+                                <th>Subrule</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if current_user.is_authenticated %}
+                            <td style="display:none"></td>
+                            {%endif%}
+                            <td style="display:none"></td>
+                            <td style="display:none"></td>
+                            <td style="display:none"></td>
+                            <td style="display:none"></td>
+                            <td style="display:none"></td>
+                            <td style="display:none"></td>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% if current_user.is_authenticated %}
+        <div>
+            <span>
+                <button class="btn btn-primary btn-user" type="submit" name="action" value='add'>Add Notification</button>
+            </span>
+            <span>
+                <button class="btn btn-primary btn-user" type="submit" name="action" value="edit">Edit Notification</button>
+            </span>
+            <span>
+                <button class="btn btn-primary btn-user" type="submit" name="action" value="delete" onclick="return confirm('Are you sure?');">Delete Notification</button>
+            </span>
+        </div>
+        {% endif %}
+    </form>
+    <br>
+    </br>
+{% endblock %}

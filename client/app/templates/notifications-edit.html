@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% set active_page = "notifications" %}
+
+{% block app_content %}
+<h1 class="h3 mb-2 text-gray-800">Edit Notification</h1>
+<p></p>
+<script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nService.js') }}"></script> 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}">
+<script>
+    window.onload = function(){
+        var n = toJson('{{notification[0].notification}}');
+        JsonToForm(n);
+        //notification = n['notificationCores'][0]['notificationCore0'];
+        select = document.getElementById("rule");
+        limit = document.getElementById("limit");
+        limitLL = document.getElementById("limitLL");
+        limitLU = document.getElementById("limitLU");
+        if (limitLL.value = undefined) {
+            limitLL.value = '';}
+        if (limitLU.value = undefined) {
+            limitLU.value = '';}
+        $("#rule").on("focusin", function(){
+            if (!select.value.includes('LL')){
+                $("#limit").data("old", $("#limit").val());}
+            else{
+                $("#limitLL").data("old", $("#limitLL").val());
+                $("#limitLU").data("old", $("#limitLU").val());}
+        });
+
+        var container = document.getElementById('container');
+        var n_id = '{{notification[0].id}}';
+        var page = '/notifications/edit/' + n_id;
+        var len = n['notificationCores'].length;
+        if (len > 1){
+            for(var i=0; i < len-1; i+=1){
+                coreName = 'notificationCore' + i;
+                notificationCore = document.getElementById(coreName);
+                activeCoreIndex = notificationCore.id.slice(16)
+                cloneDiv(notificationCore, activeCoreIndex)
+                $('#dataTable').load(page + ' #dataTable');
+            }
+            for(var i=0; i < len; i+=1){
+                coreName = 'notificationCore' + i;
+                notification = n['notificationCores'][i][coreName];
+                notification_str = JSON.stringify(notification);
+                if (notification_str.includes('limitLL')){
+                    if (i == 0){
+                        var nL = 'limit';
+                        var nLL = 'limitLL';
+                        var nLU = 'limitLU';
+                        var nLS = 'limitSimple';
+                        var nLC = 'limitComposite';
+                    }
+                    else {
+                        var nL = 'limit' + i;
+                        var nLL = 'limitLL' + i;
+                        var nLU = 'limitLU' + i;
+                        var nLS = 'limitSimple' + i;
+                        var nLC = 'limitComposite' + i;
+                    }
+                    limit = document.getElementById(nL);
+                    limitLL = document.getElementById(nLL);
+                    limitLU = document.getElementById(nLU);
+                    limitSimple = document.getElementById(nL).parentElement.parentElement;
+                    limitComposite = document.getElementById(nLL).parentElement.parentElement;
+
+                    limit.setAttribute('show', 'off');
+                    limitSimple.style.visibility = "hidden";
+                    limitSimple.style.display = "none";
+                    limitLL.setAttribute('show', 'on');
+                    limitLU.setAttribute('show', 'on');
+                    limitComposite.style.visibility = "visible";
+                    limitComposite.style.display = "";
+                    limitLU.hidden=false;
+                    limitLL.hidden=false;
+                    limit.hidden=true;
+                }
+                JsonToForm(notification);
+            }
+        }
+        else {
+            coreName = 'notificationCore0';
+            notification = n['notificationCores'][0][coreName];
+            JsonToForm(notification);
+            notification_str = JSON.stringify(notification);
+            if (notification_str.includes('limitLL')){
+                var nL = 'limit';
+                var nLL = 'limitLL';
+                var nLU = 'limitLU';
+                var nLS = 'limitSimple';
+                var nLC = 'limitComposite';
+                limit = document.getElementById(nL);
+                limitLL = document.getElementById(nLL);
+                limitLU = document.getElementById(nLU);
+                limitSimple = document.getElementById(nL).parentElement.parentElement;
+                limitComposite = document.getElementById(nLL).parentElement.parentElement;
+
+                limit.setAttribute('show', 'off');
+                limitSimple.style.visibility = "hidden";
+                limitSimple.style.display = "none";
+                limitLL.setAttribute('show', 'on');
+                limitLU.setAttribute('show', 'on');
+                limitComposite.style.visibility = "visible";
+                limitComposite.style.display = "";
+                limitLU.hidden=false;
+                limitLL.hidden=false;
+                limit.hidden=true;
+                JsonToForm(notification);
+            }
+        }
+    }
+</script>
+
+
+<div class="container-fluid" style="padding-left:0px;padding-right:0px;overflow:visible;">
+    <div class="row">
+        <div class="col-sm-1.5">
+            <label class="col-sm-12 col-form-label">Expiraton date:</label>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control datetimepicker-input" id="datetimepicker5" 
+                data-toggle="datetimepicker" data-target="#datetimepicker5" autocomplete="off"
+                name="expiration" value="{{ request.form['expiration'] or '' }}">
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#datetimepicker5').datetimepicker();
+            });
+            $('#datetimepicker5').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm', 
+            useCurrent: false,
+            showTodayButton: true,
+            showClear: true,
+            toolbarPlacement: 'bottom',
+            sideBySide: true,
+            icons: {
+                time: "fa fa-clock",
+                date: "fa fa-calendar",
+                up: "fa fa-arrow-up",
+                down: "fa fa-arrow-down",
+                previous: "fa fa-chevron-left",
+                next: "fa fa-chevron-right",
+                today: "fa fa-clock-o",
+                clear: "fa fa-trash" }
+            });
+        </script>
+        <script>
+            $(function() {
+                $("[id^=pv]").autocomplete({
+                    source:function(request, response) {
+                        $.getJSON("{{url_for('autocomplete')}}",{
+                            q: request.term, // in flask, "q" will be the argument to look for using request.args
+                        }, 
+                        function(data) {
+                            response(data.matching_results.slice(0,500)); // matching_results from jsonify
+                        });
+                    },
+                    minLength: 2,
+                    delay:100,
+                });
+            })
+        </script>
+        <div class="col-sm-1.5">
+            <label class="col-sm-12 col-form-label">Interval(minutes):</label>
+        </div>
+        <div class="col-sm-1">
+            <input type="text" class="form-control" value='60' autocomplete="off"
+            name="interval">
+        </div>
+        <div class="col-sm-1.5">
+            <label class="col-sm-12 col-form-label">Persistence:</label>
+        </div>
+        <div class="col-sm-1">
+            <select class="form-control" id="subrule" autocomplete="off" name="persistence">
+                <option value="YES">YES</option>
+                <option value="NO" selected='selected'>NO</option>
+            </select>
+        </div>
+
+    </div>
+    <p>
+    <form onsubmit="event.preventDefault()" action="" method="POST" id="editForm" novalidate>
+        <div id="container">
+            <div class="card shadow mb-4 notificationCore" id="notificationCore0" data-cloned="false"
+                data-caller="none">
+                <div class="card-body md-15">
+                    <div class="d-flex row" id="contentDiv0" data-close="false">
+                        <div class="col-sm-auto mr-1 row">
+                            <div class="">
+                                <label class="col-form-label pl-2">Variable (pv):</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="pv" autocomplete="off" 
+                                name='pv' show="on">
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mr-1 row">
+                            <div class="">
+                                <label class="col-form-label">Rule:</label>
+                            </div>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="rule" onChange="selectRule(this)" 
+                                name="rule" autocomplete="off" show="on">
+                                    <option value="" selected></option>
+                                    {% for rule in rules %}
+                                    <option value="{{rule.rule}}" data-toggle="tooltip" id="{{rule.id}}"
+                                        data-placement="top" title="{{rule.description}}">
+                                        {{rule.rule}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mr-1 row" id="limitSimple">
+                            <div class="">
+                                <label class="col-form-label">Limit (L):</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control col-sm-12" type="text" id="limit" 
+                                name='limit' autocomplete="off" show="on">
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mr-1 row" id="limitComposite" style="display: none;">
+                            <div class="">
+                                <label class="col-form-label">LL:</label>
+                            </div>
+                            <div class="col-sm-5">
+                                <input class="form-control col-sm-12" type="text" id="limitLL" 
+                                name='limitLL' autocomplete="off" show="off">
+                            </div>
+                            <div class="">
+                                <label class="col-form-label">LU:</label>
+                            </div>
+                            <div class="col-sm-5">
+                                <input class="form-control col-sm-12" type="text" id="limitLU" 
+                                name='limitLU' autocomplete="off" show="off">
+                            </div>
+                        </div> 
+                        <div class="col-sm-auto mr-1 row">
+                            <div class="">
+                                <label class="col-form-label">Subrule:</label>
+                            </div>
+                            <div class="col-sm-auto">
+                                <select class="form-control" id="subrule" onChange="changeSubrule(this)" 
+                                name='subrule' autocomplete="off">
+                                    <option value=""></option>
+                                    <option value="AND">AND</option>
+                                    <option value="OR">OR</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span>
+            <button class="btn btn-primary btn-user" type="submit" name='action' value='submit' 
+                onClick="submitForm(this, 'edit', '{{notification[0].id}}')">Submit</button>
+
+            <button class="btn btn-primary btn-user" type="cancel" name='action' value='cancel' 
+                onClick="submitForm(this, 'cancel')">Cancel</button>
+        </span>
+    </form>
+</div>
+
+{% endblock %}

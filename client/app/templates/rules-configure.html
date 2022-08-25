@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% set active_page = "rules_configure" %}
+
+{% block app_content %}
+<form action="" action='{{url_for("rules_configure")}}' method="POST">
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered table-sm" id="dataTable" width="100%" cellspacing="0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Select</th>
+                        <th>ID</th>
+                        <th>Rule</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rule in rules %}
+                    <tr>
+                        <td><input name='checkbox[]' class="cb" type="checkbox" 
+                            id="{{ rule.id }}" value="{{rule.id}}"></td>
+                        <td>{{ rule.id }}</td>
+                        <td>{{ rule.rule }}</td>
+                        <td>{{ rule.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row" >
+    <div class="col-sm-1">
+        <button class="btn btn-primary btn-user" type="submit" name="action" value='add'>Add Rule</button>
+    </div>
+    <div class="col-sm-1">
+        <button class="btn btn-primary btn-user" type="submit" name="action" value="edit">Edit Rule</button>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-primary btn-user" type="submit" name="action" value="delete" onclick="return confirm('Are you sure?');">Delete Rule</button>
+    </div>
+</div>
+</form>
+
+
+{% endblock %}

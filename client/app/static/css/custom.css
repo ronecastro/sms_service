@@ -1,0 +1,24 @@
+div.dataTables_wrapper div.dataTables_length label {
+  display: none;
+}
+div.dataTables_wrapper div.dataTables_length select {
+  display: none;
+}
+div.dataTables_wrapper div.dataTables_filter {
+  display: none;
+}
+div.dataTables_wrapper div.dataTables_filter label {
+  display: none;
+}
+div.dataTables_wrapper div.dataTables_filter input {
+  display: none;
+}
+div.dataTables_wrapper div.dataTables_paginate {
+  display: none;
+}
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+  display: none;
+}
+div.dataTables_wrapper div.dataTables_info {
+  display: none;
+}

@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% set active_page = "notifications" %}
+
+{% block app_content %}
+<h1 class="h3 mb-2 text-gray-800">Add Notification</h1>
+<p></p>
+<script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nService.js') }}"></script> 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}">
+
+<div class="container-fluid" style="padding-left:0px;padding-right:0px;">
+    <div class="row">
+        <div class="col-sm-1.5">
+            <label class="col-sm-12 col-form-label">Expiraton date:</label>
+        </div>
+        <div class="col-sm-2">
+            <input type="text" class="form-control datetimepicker-input" id="datetimepicker5" 
+                data-toggle="datetimepicker" data-target="#datetimepicker5">
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#datetimepicker5').datetimepicker();
+            });
+            $('#datetimepicker5').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm', 
+            useCurrent: false,
+            showTodayButton: true,
+            showClear: true,
+            toolbarPlacement: 'bottom',
+            sideBySide: true,
+            icons: {
+                time: "fa fa-clock",
+                date: "fa fa-calendar",
+                up: "fa fa-arrow-up",
+                down: "fa fa-arrow-down",
+                previous: "fa fa-chevron-left",
+                next: "fa fa-chevron-right",
+                today: "fa fa-clock-o",
+                clear: "fa fa-trash" }
+            });
+        </script>
+        <script>
+            $(function() {
+                $("[id^=pv]").autocomplete({
+                    source:function(request, response) {
+                        $.getJSON("{{url_for('autocomplete')}}",{
+                            q: request.term, // in flask, "q" will be the argument to look for using request.args
+                        }, 
+                        function(data) {
+                            response(data.matching_results.slice(0,500)); // matching_results from jsonify
+                        });
+                    },
+                    minLength: 2,
+                    delay:100,
+                });
+            })
+        </script>
+        <div class="col-sm-1.5">
+            <label class="col-sm-12 col-form-label">Interval(minutes):</label>
+        </div>
+        <div class="col-sm-1">
+            <input type="number" class="form-control" id='interval' value=60>
+        </div>
+        <div class="col-sm-1.5">
+            <label class="col-sm-12 col-form-label">Persistence:</label>
+        </div>
+        <div class="col-sm-1">
+            <select class="form-control" id="persistence">
+                <option value="YES">YES</option>
+                <option value="NO" selected='selected'>NO</option>
+            </select>
+        </div>
+
+    </div>
+    <p>
+    <form onsubmit="event.preventDefault()" action="" method="POST" id="addForm" novalidate>
+        <div id="container">
+            <div class="card shadow mb-4 notificationCore" id="notificationCore0" data-cloned="false"
+                data-caller="none">
+                <div class="card-body md-15">
+                    <div class="d-flex row" id="contentDiv0" data-close="false">
+                        <div class="col-sm-4 mr-1 row">
+                            <div class="col-sm-1 mr-2">
+                                <label class="col-form-label">PV:</label>
+                            </div>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="pv" show="on">
+                            </div>
+                        </div>
+                        <div class="col-sm-auto mr-1 row">
+                            <div class="">
+                                <label class="col-form-label">Rule:</label>
+                            </div>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="rule" onChange="selectRule(this)"
+                                    show='on'>
+                                    <option value="" selected></option>
+                                    {% for rule in rules %}
+                                    <option value="{{rule.rule}}" data-toggle="tooltip" id="{{rule.id}}"
+                                        data-placement="top" title="{{rule.description}}">
+                                        {{rule.rule}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mr-1 row" id="limitSimple">
+                            <div class="">
+                                <label class="col-form-label">Limit (L):</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input class="form-control col-sm-12" type="number" id="limit" show="on">
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mr-1 row" id="limitComposite" style="display: none;">
+                            <div class="">
+                                <label class="col-form-label">LL:</label>
+                            </div>
+                            <div class="col-sm-5">
+                                <input class="form-control col-sm-12" type="number" id="limitLL" show="off">
+                            </div>
+                            <div class="">
+                                <label class="col-form-label">LU:</label>
+                            </div>
+                            <div class="col-sm-5">
+                                <input class="form-control col-sm-12" type="number" id="limitLU" show="off">
+                            </div>
+                        </div> 
+                        <div class="col-sm-auto mr-1 row">
+                            <div class="">
+                                <label class="col-form-label">Subrule:</label>
+                            </div>
+                            <div class="col-sm-auto">
+                                <select class="form-control" id="subrule" onChange="changeSubrule(this)">
+                                    <option value=""></option>
+                                    <option value="AND">AND</option>
+                                    <option value="OR">OR</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span>
+            <button class="btn btn-primary btn-user" type="submit" value='add' 
+                onClick="submitForm(this, 'add')" >Submit</button>
+        </span>
+    </form>
+</div>
+
+{% endblock %}

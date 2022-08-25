@@ -1,0 +1,2 @@
+FLASK_APP=sms_service.py
+FLASK_ENV=development

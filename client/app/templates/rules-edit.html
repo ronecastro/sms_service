@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% set active_page = "rules_edit" %}
+
+{% block app_content %}
+<form method="POST" id="editRule" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="card shadow mb-4">
+        <div class="card-body md-15">
+            <div class="row has-validation">
+                <div class="col-sm-1.5">
+                    <label class="col-sm-1.5 col-form-label">Rule:</label>
+                </div>
+                <div class="form-group col-sm-3 has-validation">
+                    <div class="col-sm-12">
+                    {{ form.rule(class_="form-control form-control-user" + 
+                        (" is-invalid" if form.rule.errors else ""), id="inputValRule",
+                        default="{{rule.rule}}", size=32, **{"aria-describedby": 
+                        "inputValRule", "required": ""}) }}
+                    </div>
+                    {% for error in form.rule.errors %}
+                    <div class="text-danger col-sm-12">
+                        <small>{{ error }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="form-group col-sm-3 has-validation">
+                    <div class="col-sm-12">
+                    {{ form.description(class_="form-control form-control-user" + 
+                        (" is-invalid" if form.description.errors else ""), id="inputValDesccription",
+                        default="{{rule.description}}", size=32, **{"aria-describedby": 
+                        "inputValDescription", "required": ""}) }}
+                    </div>
+                    {% for error in form.description.errors %}
+                        <div class="text-danger col-sm-12">
+                            <small>{{ error }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-1">
+            {{ form.submit(class="btn btn-primary btn-user btn-block" ) }}
+        </div>
+        <div class="col-sm-1">
+            {{ form.cancel(class="btn btn-primary btn-user btn-block" ) }}
+        </div>
+    </div>
+</form>
+{% endblock %}

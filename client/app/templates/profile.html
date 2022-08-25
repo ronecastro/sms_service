@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% set active_page = "profile" %}
+
+{% block app_content %}
+    <!-- Page Heading -->
+    <h1 class="h3 mb-1 text-gray-800">user: <i><b>{{user.username}}</b></i></h1>
+    <p> </p>
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4" style="display:inline-block;">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered table-sm" id="dataTable" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Email</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <td>{{user.email}}</td>
+                        <td>{{user.phone}}</td>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div>
+            <a class="btn btn-primary" href="{{ url_for('profile_edit', username=user.username) }}">Edit</a>
+        </div>
+    </div>
+{% endblock %}
