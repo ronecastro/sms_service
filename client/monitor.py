@@ -14,8 +14,8 @@ def evaluate(debug=False):
     # fullpvlist = dbfunctions.pvlistfromdb()
     i, j, l = 0, 0, 0
     fullpvlist = pvlistfromdb()
+    l = 0
     while True:
-        l = 0
         if debug == True:
             print('>>> Iteration', l)
         notifications_raw = db.session.query(Notification).all()
@@ -211,7 +211,7 @@ def evaluate(debug=False):
         sleep(10)
         if debug == True:
             l += 1  
-            break   
+            # break   
 
             # if j >= len(notifications_raw) - 1:
             #    print(j)

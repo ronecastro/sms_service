@@ -2,4 +2,11 @@
 2022-09-10 08:52:58.558870 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
 2022-09-10 09:42:13.753089 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
 2022-09-13 09:01:10.187043 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
+2022-09-13 09:58:48.975351 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
+2022-09-13 10:19:43.895705 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
+2022-09-13 12:57:21.458419 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
+2022-09-13 12:58:23.705425 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
+2022-09-13 12:59:25.929090 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
+2022-09-13 13:00:28.565124 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
+2022-09-13 13:01:31.168368 message to rone.castro sent to server. PV: SI-13C4:DI-DCCT:Current-Mon
 

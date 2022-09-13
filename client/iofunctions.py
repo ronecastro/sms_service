@@ -66,7 +66,7 @@ def tcpsock_client(msg, ip='locahost', port=5007):
             return 'ok'
         else:
             sock.close()
-            return 'error on received echo msg'
+            return 'error on received echo msg', rcvd_data, msg
     else:
         sock.close()
         return 'error on sending msg to server'

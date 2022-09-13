@@ -125,7 +125,7 @@ def sendnotification(pvlist, pvpool):
     if 'Many#' in body:
         body = 'Many PVs reached their limits!\n\r'
         body += 'PVs alike: ' + pv + '\n\r'
-    aux = (user.username, user.phone)
+    aux = (user.username, user.phone, user.email)
     msg = [aux, header + body]
     ip = str(fromcfg('ADDRESS', 'ip'))
     port = int(fromcfg('ADDRESS', 'port'))

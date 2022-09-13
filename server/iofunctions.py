@@ -32,7 +32,6 @@ def sendsms(mode, number, msg):
 
 def tcpsock_server(ip='localhost', port=5007):
     err = ''
-    data = b''
     while True:
         # Create a TCP/IP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,6 +43,7 @@ def tcpsock_server(ip='localhost', port=5007):
         sock.listen()
         conn, addr = sock.accept()
         # print(f"Connected by {addr}")
+        data = b''
         try:
             data += conn.recv(1024)
             conn.sendall(data)
