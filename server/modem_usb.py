@@ -1,4 +1,5 @@
 import serial, time, re
+from psutil import process_iter, pid_exists
 
 ##############################################################
 # We need to change permission for the usb file of the modem #
@@ -14,15 +15,15 @@ import serial, time, re
 # Verify modem file permission with the bellow command: ######
 # <stat /dev/ttyUSB0> ########################################
 # Access must be with description (0666/crw-rw-rw) ###########
-# Also, kill ModemManagement proccess with command: ##########
-# <lsof /dev/ttyUSB0> then <sudo kill proccess_id> ###########
+# Also, kill ModemManagement proccess with commands: #########
+# <sudo lsof -t /dev/ttyUSB0> then <sudo kill proccess_id> ###
 # Sometimes it's necessary kill, start, than kill again the ##
 # ModemManager proccess. Use the following commands: #########
 # <sudo service ModemManager status> (look for Main PID) #####
 # <sudo kill process_ID> #####################################
 # <sudo service ModemManager start> ##########################
 # Keep ModemManager proccess killed! #########################
-# Wait until the modem is ready, some 60 seconds #############
+# Wait until the modem is ready, sometimes 60 seconds ########
 ##############################################################
 
 
@@ -31,23 +32,27 @@ class Modem:
         self.path = path
         self.debug = debug
         self.msgnumber = None
-        self.serial_connection = serial.Serial(path, baudrate=115200, timeout=0)
+        self.serial_connection = serial.Serial(path, baudrate=115200, timeout=5)
         self.serial_connection.reset_input_buffer()
 
-    def send_to_modem(self, msg):
+    def send_to_modem(self, msg, sleep=0.2):
         self.serial_connection.write(msg.encode())
-    
-    def get_answer(self, sleep=0.2):
         time.sleep(sleep)
+    
+    def get_answer(self, strt_sleep=0.2, sleep=0.2):
+        time.sleep(strt_sleep)
         quantity = self.serial_connection.in_waiting
         ans = ''
         while True:
             if quantity > 0:
                 ans += self.serial_connection.read(quantity).decode()
+                print('ans get answer: ', ans)
                 time.sleep(sleep)
             else:
-                time.sleep(sleep) 
+                time.sleep(sleep)
+            print('quantity before:', quantity) 
             quantity = self.serial_connection.in_waiting
+            print('quantity after:', quantity) 
             if quantity == 0:
                 break
         if self.debug:
@@ -142,22 +147,29 @@ class Modem:
         ans = self.get_answer(sleep=1)
         return ans
 
+    def kill_modem_proc(self):
+        for proc in process_iter():
+            if proc.name() == 'ModemManager':
+                proc.kill()
+                print('Modem process killed')
+
     def initialize(self):
         self.reset()
         ans = self.reset()
-        if 'OK' in ans:
-            self.verbose_on_error()
-        else:
-            return ans
-        if 'OK' in ans:
+        if self.debug == True:
+            if ('OK' in ans) and ('nOK' not in ans):
+                self.verbose_on_error()
+            else:
+                return ans
+        if ('OK' in ans) and ('nOK' not in ans):
             self.set_mode(mode='text')
         else:
             return ans
-        if 'OK' in ans:
+        if ('OK' in ans) and ('nOK' not in ans):
             self.set_storage_area(area='ME')
         else:
             return ans
-        if 'OK' in ans:
+        if ('OK' in ans) and ('nOK' not in ans):
             return ans
         else:
             return ans
@@ -171,7 +183,8 @@ class Modem:
             if '>' in ans:
                 cmd = msg + chr(26)
                 self.send_to_modem(cmd)
-                ans = self.get_answer(sleep=0.2)
+                time.sleep(5)
+                ans = self.get_answer()
             return ans
 
         elif mode == 'indirect':
@@ -191,7 +204,7 @@ class Modem:
                             cmd = 'AT+CMSS=' + msgnumber + '\r'
                             self.send_to_modem(cmd)
                             ans = self.get_answer(sleep=4)
-                            if 'OK' in ans:
+                            if ('OK' in ans) and ('nOK' not in ans):
                                 if clearmemo:
                                     self.clear_storage(msgnumber)
                                     return ans

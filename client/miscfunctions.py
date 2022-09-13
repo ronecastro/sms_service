@@ -1,7 +1,7 @@
 from epics import caget, caget_many
-import json, re
+import json, re, pickle
 from classes import empty_class
-from iofunctions import tcpsock_client
+from iofunctions import tcpsock_client, fromcfg
 
 def testpv(notificationCore, pool, user, fullpvlist): #test pv using rule and limits
     pvlist = []
@@ -125,7 +125,12 @@ def sendnotification(pvlist, pvpool):
     if 'Many#' in body:
         body = 'Many PVs reached their limits!\n\r'
         body += 'PVs alike: ' + pv + '\n\r'
-    msg = [user, header + body]
-    tcpsock_client(msg)
-    print(msg)
-    print('SMS Sent!')
+    aux = (user.username, user.phone)
+    msg = [aux, header + body]
+    ip = str(fromcfg('ADDRESS', 'ip'))
+    port = int(fromcfg('ADDRESS', 'port'))
+    ans = tcpsock_client(msg, ip, port)
+    if ans == 'ok':
+        return 'ok'
+    else:
+        return 'error on tcpsock_client:', ans

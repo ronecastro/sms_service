@@ -1,46 +1,67 @@
-import configparser
+import configparser, socket, pickle
 from os import path
-import socket
+
+def current_path(file=None):
+    try:
+        dir_path = path.dirname(path.realpath(__file__), )
+        if file != None:
+            config_path = path.join(dir_path, file)
+            return config_path
+        else:
+            return dir_path
+    except Exception as e:
+        return e
 
 def fromcfg(section,key):
     try:
+        fullpath = current_path('config.cfg')
         config = configparser.RawConfigParser()
-        dir_path = path.dirname(path.realpath(__file__), )
-        config_path = path.join(dir_path, 'config.cfg')
-        config.read_file(open(config_path)) 
+        # dir_path = path.dirname(path.realpath(__file__), )
+        # config_path = path.join(dir_path, 'config.cfg')
+        config.read_file(open(fullpath)) 
         r = config.get(section,key)
     except:
         return "error on reading 'config.cfg' file"
     return r
 
-def tcpsock_client(msg):
-    pass
+def write(filepath, msg):
+    try:
+        f = open(filepath, 'a')
+        f.write(msg)
+        f.close
+        return 'ok'
+    except Exception as e:
+        return e
+
+
+def tcpsock_client(msg, ip='locahost', port=5007):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(5)
     data = b''
     s = ''
     conn = ''
+    rcvd_data = b''
 
-    server_ip = fromcfg('ADDRESS', 'server_ip')
-    server_port = fromcfg('ADDRESS', 'server_port')
-    server_address = (server_ip, server_port)
-
+    address = (ip, port)
     try: #sock connect
-        conn = sock.connect(server_address)
-    except:
-        return "error on sock 'connect' command with description: " + "'" + conn + "'"
+        sock.connect(address)
+    except Exception as e:
+        return "error on 'connect':", e
 
     try:# sock send msg
-        s = sock.sendall(msg.encode())
-    except:
-        return "error on sock 'sendall' command with description: " + "'" + s + "'"
+        send_data = pickle.dumps(msg)
+        s = sock.sendall(send_data)
+    except Exception as e:
+        return "error on 'sendall':", e
 
     if s == None:
         try:
             data = sock.recv(1024)
-        except:
-            return data
+        except Exception as e:
+            return 'error', e
 
-        if data.decode() == msg:
+        rcvd_data = pickle.loads(data)
+        if rcvd_data == msg:
             sock.close()
             return 'ok'
         else:
@@ -49,3 +70,7 @@ def tcpsock_client(msg):
     else:
         sock.close()
         return 'error on sending msg to server'
+
+# ip = str(fromcfg('ADDRESS', 'ip'))
+# port = int(fromcfg('ADDRESS', 'port'))
+# print(tcpsock_client('oyeah', ip, port))

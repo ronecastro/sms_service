@@ -154,7 +154,7 @@ def forgot():
 
 @app.route('/notifications', methods=['GET', 'POST'])
 def notifications():
-    print('notification session', session)
+    # print('notification session', session)
     if request.method == "POST":
         action = request.form['action']
         if action == 'add':
@@ -202,7 +202,7 @@ def notifications_add():
     if request.method == "POST":
         requestJson = json.dumps(request.get_json(force=True))
         requestJson_load = json.loads(requestJson)
-        print('requestJson_load', requestJson_load)
+        # print('requestJson_load', requestJson_load)
         expiration = requestJson_load['expiration']
         interval = requestJson_load['interval']
         pv = requestJson_load['notificationCores'][0]['notificationCore0']['pv']

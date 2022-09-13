@@ -1,6 +1,10 @@
 import sqlite3, re, iofunctions, requests, json
+from tkinter import E
+from app.models import Notification, User, Rule
+from app import db
 from os import path
 from flask import jsonify
+from time import sleep
 
 def get_connection(database):
     current_folder = path.dirname(path.realpath(__file__))
@@ -70,3 +74,20 @@ def searchdb(search):
         for i in row:
             m.append(i)
     return jsonify(matching_results=m)
+
+
+def update_db(database, id, key=None, value=None):
+    try:
+        if database == 'Notification':
+            db.session.query(Notification).filter_by(id=id).update({key: value})
+            db.session.commit()
+        if database == 'User':
+            db.session.query(User).filter_by(id=id).update({key: value})
+            db.session.commit()
+        if database == 'Rule':
+            db.session.query(Rule).filter_by(id=id).update({key: value})
+            db.session.commit()
+        ans = 'ok'
+    except Exception as e:
+        return e
+    return ans

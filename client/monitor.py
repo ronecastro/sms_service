@@ -3,23 +3,28 @@ from app import app, db
 from app.models import User, Notification, Rule
 from datetime import datetime, timedelta
 from classes import notification_class, user_class, empty_class
-from dbfunctions import pvlistfromdb
+from dbfunctions import pvlistfromdb, update_db
 from re import compile
 from miscfunctions import testpv, makepvpool, sendnotification
+from iofunctions import write, current_path
+from time import sleep
 
-def evaluate():
+def evaluate(debug=False):
     # dbfunctions.update_fullpvlist()
     # fullpvlist = dbfunctions.pvlistfromdb()
-    i, j = 0, 0
+    i, j, l = 0, 0, 0
     fullpvlist = pvlistfromdb()
     while True:
-        now = datetime.now()
+        l = 0
+        if debug == True:
+            print('>>> Iteration', l)
         notifications_raw = db.session.query(Notification).all()
         pvpool = makepvpool(notifications_raw, fullpvlist) #dict with pv : value
-        # print(pvpool)
+        if debug == True:
+            print('>>> pvpool:')
+            print(pvpool)
         for data in notifications_raw: #for each notification
             pvlist_local = []
-            pos = notifications_raw.index(data)
             user_raw = db.session.query(User).filter_by(id=data.user_id).first()
 
             notification = notification_class(id = data.id, \
@@ -37,10 +42,16 @@ def evaluate():
                     email = user_raw.email,\
                     phone = user_raw.phone)
 
-            datetime_created = datetime.strptime(notification.created, '%Y-%m-%d %H:%M')
-            #print('notification', notification.notification)
+            if debug == True:
+                print('>>> notification:')
+                attrs = vars(notification)
+                print(attrs)
+                print('>>> user:')
+                attrs = vars(user)
+                print(attrs)
+
+            # datetime_created = datetime.strptime(notification.created, '%Y-%m-%d %H:%M')
             n = json.loads(notification.notification)
-            #print(len(n['notificationCores']))
             k = 0
             toEval = ''
             notificationCore = empty_class()
@@ -71,6 +82,9 @@ def evaluate():
                 #print('======== pv/rule/limit/subrule ========')
                 #print(vars(notificationCore))
                 r = testpv(notificationCore, pvpool, user, fullpvlist)
+                if debug == True:
+                    print('>>> testpv result:')
+                    print(r)
                 for y in r:
                     pvlist_local.append(y) #build list with pv rule test
                 if len(notificationCore.pv) == 1:
@@ -84,40 +98,123 @@ def evaluate():
                         else:
                             toEval += str(r[p][0]) + ')'
                         p += 1
-                #print('r', r)
-                #print('toEval', toEval)
-            #print('======== marker ========')
-            #print(notification.id, eval(toEval))
-            #print(notification.last_sent)
             if notification.last_sent != None:
                 notification.sent = True
             else:
                 notification.sent = False
-            #print('pvlist_local', pvlist_local)
             interval = timedelta(minutes=int(notification.interval))
+            now = datetime.now()
             if now <= notification.expiration: #if notification didnt expire
+                if debug == True:
+                    print(">>> Notification didn't expire.")
+                var = pvlist_local[0][1][0]
+                owner = pvlist_local[0][-1].username
                 if notification.sent == True: #was sent
-                    #interval time has already passed
+                    if debug == True:
+                        print('>>> Notification already sent in', notification.last_sent)
                     if now > (notification.last_sent + interval):
-                        if notification.persistent == 'YES': #persistence YES
+                        if notification.persistence == 'YES': #persistence YES
+                            if debug == True:
+                                print('>>> Notification is persistent.')
+                                print('Eval result:', eval(toEval))
                             if eval(toEval):
-                                msg = ''
-                                #print('eval sent persistence YES', toEval)
-                                sendnotification(pvlist_local, pvpool)
+                                if debug == True:
+                                    print('pvlist:', pvlist_local)
+                                ans = sendnotification(pvlist_local, pvpool)
+                                if debug == True:
+                                    print('sendnotification result:', ans)
+                                if ans == 'ok':
+                                    log = str(datetime.now()) + ' message to ' + owner + \
+                                        ' sent to server. PV: ' + var + '\n\r'
+                                    fullpath = current_path('log.txt')
+                                    r = write(fullpath, log)
+                                    if debug == True:
+                                        print('>>> SMS notification sent.')
+                                    if r != 'ok':
+                                        if debug == True:
+                                            print('>>> SMS notification not sent due error.')
+                                        print(r)
+                                    else:
+                                        id = notification.id
+                                        aux = update_db('Notification', id, 'last_sent', now)
+                                        if debug == True:
+                                            if aux == 'ok':
+                                                print('>>> last_sent database field updated.')
+                                            else:
+                                                print('>>> error writing last _sent database field:', aux)
+                                else:
+                                    if debug == True:
+                                        print(ans)
                         else: #persistence NO
+                            if debug == True:
+                                print('>>> Notification not persistent.')
                             if notification.sent == False: #not sent
-                                msg = ''
-                                #print('eval sent persistence NO', toEval)
-                                sendnotification(pvlist_local, pvpool)
+                                if debug == True:
+                                    print('>>> Notification never sent before.')
+                                    print('Eval result:', eval(toEval))
+                                if eval(toEval):
+                                    ans = sendnotification(pvlist_local, pvpool)
+                                    if debug == True:
+                                        print('sendnotification result:', ans)
+                                    if ans == 'ok':
+                                        log = str(datetime.now()) + ' message to ' + owner + \
+                                            ' sent to server. PV: ' + var + '\n\r'
+                                        fullpath = current_path('log.txt')
+                                        r = write(fullpath, log)
+                                        if r != 'ok':
+                                            if debug == True:
+                                                print('>>> SMS notification not sent due error.')
+                                            print(r)
+                                        else:
+                                            if debug == True:
+                                                print('>>> SMS notification sent')
+                                            id = notification.id
+                                            aux = update_db('Notification', id, 'last_sent', now)
+                                            if debug == True:
+                                                if aux == 'ok':
+                                                    print('>>> last_sent database field updated.')
+                                                else:
+                                                    print('>>> error writing last _sent database field:', aux)
+                                    else:
+                                        if debug == True:
+                                            print(ans)
                 else: #wasnt sent yet
+                    if debug == True:
+                        print('>>> Notification never sent before.')
+                        print('Eval result:', eval(toEval))
                     if eval(toEval):
-                        msg = ''
-                        #print('eval not sent', toEval)
-                        sendnotification(pvlist_local, pvpool)
-                        
+                        ans = sendnotification(pvlist_local, pvpool)
+                        if debug == True:
+                            print('sendnotification result:', ans)
+                        if ans == 'ok':
+                            log = str(now) + ' message to ' + owner + \
+                                ' sent to server. PV: ' + var + '\n\r'
+                            fullpath = current_path('log.txt')
+                            r = write(fullpath, log)
+                            if r != 'ok':
+                                if debug == True:
+                                    print('>>> SMS notification not sent due error.')
+                                print(r)
+                            else:
+                                if debug == True:
+                                    print('>>> SMS notification sent.')
+                                id = notification.id
+                                aux = update_db('Notification', id, 'last_sent', now)
+                                if debug == True:
+                                    if aux == 'ok':
+                                        print('>>> last_sent database field updated.')
+                                    else:
+                                        print('error writing last _sent database field:', aux)
+                        else:
+                            if debug == True:
+                                print(ans)
+        sleep(10)
+        if debug == True:
+            l += 1  
+            break   
 
-            if j >= len(notifications_raw) - 1:
-                exit()
-            j += 1
+            # if j >= len(notifications_raw) - 1:
+            #    print(j)
+            # j += 1
 
 evaluate()

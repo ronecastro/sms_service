@@ -28,6 +28,16 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def __getitem__(self, key):
+        if key == 'id':
+            return self.id
+        if key == 'username':
+            return self.username
+        if key == 'email':
+            return self.email
+        if key == 'phone':
+            return self.phone
+
 class Notification(db.Model):
     __tablename__ = "notifications"
     id = db.Column(db.Integer, primary_key=True)
@@ -39,6 +49,18 @@ class Notification(db.Model):
     def __repr__(self):
         return '<{}>'.format(self.notification)
 
+    def __getitem__(self, key):
+        if key == 'id':
+            return self.id
+        if key == 'user_id':
+            return self.user_id
+        if key == 'notification':
+            return self.notification
+        if key == 'last_sent':
+            return self.last_sent
+        if key == 'user':
+            return self.user
+
 class Rule(db.Model):
     __tablename__ = "rules"
     id = db.Column(db.Integer, primary_key=True)
@@ -47,3 +69,11 @@ class Rule(db.Model):
 
     def __repr__(self):
         return '<Rule {}>'.format(self.rule)
+
+    def __getitem__(self, key):
+        if key == 'id':
+            return self.id
+        if key == 'rule':
+            return self.rule
+        if key == 'description':
+            return self.description
