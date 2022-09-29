@@ -84,7 +84,7 @@ def makepvpool(notifications_raw, fullpvlist): #buid dict with pv : value
     #print('vals_', vals_)
     return pvpool
 
-def sendnotification(pvlist, pvpool):
+def notification2server(pvlist, pvpool):
     header = 'WARNING!\n\r'
     body = ''
     sizetrue = 0

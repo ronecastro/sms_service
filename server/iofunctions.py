@@ -1,6 +1,7 @@
 from modem_usb import Modem
 from os import path
-import configparser, socket, pickle
+from classes import socketServer
+import configparser, pickle, socket
 
 def fromcfg(section,key):
     try:
@@ -31,33 +32,19 @@ def sendsms(mode, number, msg):
         return 'error on modem initialization: ', ans
 
 def tcpsock_server(ip='localhost', port=5007):
-    err = ''
-    while True:
-        # Create a TCP/IP socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    address = (ip, port)
+    server = socketServer(address)
+    sock = server.create_socket()
+    ans = server.bind_address(sock)
+    ans = server.listen(sock)
+    conn, addr = server.accept_connection(sock)
+    data = server.receive_data(conn, 1024, echo=True)
+    print(data)
 
-        # Bind the socket to the port
-        server_address = (ip, port)
-        sock.bind(server_address)
-        sock.listen()
-        conn, addr = sock.accept()
-        # print(f"Connected by {addr}")
-        data = b''
-        try:
-            data += conn.recv(1024)
-            conn.sendall(data)
-        except Exception as e:
-            err += e
-            return 'error at conn.recv: ', e
-        finally:
-            sock.close()
-        rcvd_data = pickle.loads(data)
-        print(rcvd_data)
 
-ip = str(fromcfg('ADDRESS', 'ip'))
-port = int(fromcfg('ADDRESS', 'port'))
-msg = tcpsock_server(ip, port)
-print(msg)
+# ip = str(fromcfg('ADDRESS', 'ip'))
+# port = int(fromcfg('ADDRESS', 'port'))
+# msg = tcpsock_server(ip, port)
+# print(msg)
 # 19996018157
 # print(sendsms(mode='direct', number='19997397443', msg='test'))

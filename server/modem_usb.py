@@ -1,5 +1,4 @@
 import serial, time, re
-from psutil import process_iter, pid_exists
 
 ##############################################################
 # We need to change permission for the usb file of the modem #

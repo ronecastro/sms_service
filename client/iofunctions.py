@@ -1,5 +1,6 @@
 import configparser, socket, pickle
 from os import path
+from classes import socketClient
 
 def current_path(file=None):
     try:
@@ -33,43 +34,24 @@ def write(filepath, msg):
     except Exception as e:
         return e
 
-
 def tcpsock_client(msg, ip='locahost', port=5007):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)
-    data = b''
-    s = ''
-    conn = ''
-    rcvd_data = b''
-
     address = (ip, port)
-    try: #sock connect
-        sock.connect(address)
-    except Exception as e:
-        return "error on 'connect':", e
-
-    try:# sock send msg
-        send_data = pickle.dumps(msg)
-        s = sock.sendall(send_data)
-    except Exception as e:
-        return "error on 'sendall':", e
-
-    if s == None:
-        try:
-            data = sock.recv(1024)
-        except Exception as e:
-            return 'error', e
-
-        rcvd_data = pickle.loads(data)
-        if rcvd_data == msg:
-            sock.close()
-            return 'ok'
-        else:
-            sock.close()
-            return 'error on received echo msg', rcvd_data, msg
+    client = socketClient(address)
+    sock = client.create_socket()
+    ans = client.connect(sock)
+    if ans == 'ok':
+        ans = client.send_data(sock, msg)
     else:
-        sock.close()
-        return 'error on sending msg to server'
+        return 'error on connecting to server', ans
+    if ans == 'ok':
+        ans = client.receive_data(sock, 1024)
+        if ans == msg:
+            ans = 'ok'
+        else:
+            client.close(sock)
+            return 'error on receiving data', ans
+    client.close(sock)
+    return ans
 
 # ip = str(fromcfg('ADDRESS', 'ip'))
 # port = int(fromcfg('ADDRESS', 'port'))

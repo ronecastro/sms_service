@@ -5,24 +5,26 @@ from datetime import datetime, timedelta
 from classes import notification_class, user_class, empty_class
 from dbfunctions import pvlistfromdb, update_db
 from re import compile
-from miscfunctions import testpv, makepvpool, sendnotification
+from miscfunctions import testpv, makepvpool, notification2server
 from iofunctions import write, current_path
 from time import sleep
 
-def evaluate(debug=False):
+def evaluate(debug=False, exclude=[]):
     # dbfunctions.update_fullpvlist()
     # fullpvlist = dbfunctions.pvlistfromdb()
     i, j, l = 0, 0, 0
     fullpvlist = pvlistfromdb()
     l = 0
     while True:
-        if debug == True:
-            print('>>> Iteration', l)
+        if 'iteration' not in exclude:
+            if debug == True:
+                print('>>> Iteration', l)
         notifications_raw = db.session.query(Notification).all()
         pvpool = makepvpool(notifications_raw, fullpvlist) #dict with pv : value
-        if debug == True:
-            print('>>> pvpool:')
-            print(pvpool)
+        if 'pvpool' not in exclude:
+            if debug == True:
+                print('>>> pvpool:')
+                print(pvpool)
         for data in notifications_raw: #for each notification
             pvlist_local = []
             user_raw = db.session.query(User).filter_by(id=data.user_id).first()
@@ -41,14 +43,14 @@ def evaluate(debug=False):
                     username = user_raw.username, \
                     email = user_raw.email,\
                     phone = user_raw.phone)
-
-            if debug == True:
-                print('>>> notification:')
-                attrs = vars(notification)
-                print(attrs)
-                print('>>> user:')
-                attrs = vars(user)
-                print(attrs)
+            if 'notification' not in exclude:
+                if debug == True:
+                    print('>>> notification:')
+                    attrs = vars(notification)
+                    print(attrs)
+                    print('>>> user:')
+                    attrs = vars(user)
+                    print(attrs)
 
             # datetime_created = datetime.strptime(notification.created, '%Y-%m-%d %H:%M')
             n = json.loads(notification.notification)
@@ -61,30 +63,42 @@ def evaluate(debug=False):
                     comp_regex = compile(item[nC]['pv'])
                     notificationCore.pv = list(filter(comp_regex.match, fullpvlist))
                     notificationCore.rule = item[nC]['rule']
+                    toDebug = [notificationCore.pv, notificationCore.rule]
                     if 'LL' not in item[nC]['rule']:
                         notificationCore.limit = item[nC]['limit']
+                        toDebug.append(notificationCore.limit)
                     else:
                         notificationCore.limitLL = item[nC]['limitLL']
                         notificationCore.limitLU = item[nC]['limitLU']
+                        toDebug.append(notificationCore.limitLL)
+                        toDebug.append(notificationCore.limitLU)
                     notificationCore.subrule = item[nC]['subrule']
                 else: #variables for notificationCore1 and so on
                     comp_regex = compile(item[nC]['pv' + str(k)])
                     notificationCore.pv = list(filter(comp_regex.match, fullpvlist))
                     notificationCore.rule = item[nC]['rule' + str(k)]
+                    toDebug = [notificationCore.pv, notificationCore.rule]
                     if 'LL' not in item[nC]['rule' + str(k)]:
                         notificationCore.limit = item[nC]['limit' + str(k)]
+                        toDebug.append(notificationCore.limit)
                     else:
                         notificationCore.limitLL = item[nC]['limitLL' + str(k)]
                         notificationCore.limitLU = item[nC]['limitLU' + str(k)]
+                        toDebug.append(notificationCore.limitLL)
+                        toDebug.append(notificationCore.limitLU)
                     notificationCore.subrule = item[nC]['subrule' + str(k)]
                 #print(notificationCore.pv, notificationCore.rule)
                 k += 1
                 #print('======== pv/rule/limit/subrule ========')
                 #print(vars(notificationCore))
-                r = testpv(notificationCore, pvpool, user, fullpvlist)
                 if debug == True:
-                    print('>>> testpv result:')
-                    print(r)
+                    print('< pv, rule, limit >')
+                    print(toDebug)
+                r = testpv(notificationCore, pvpool, user, fullpvlist)
+                if 'testpv' not in exclude:
+                    if debug == True:
+                        print('>>> testpv result:')
+                        print(r)
                 for y in r:
                     pvlist_local.append(y) #build list with pv rule test
                 if len(notificationCore.pv) == 1:
@@ -118,11 +132,12 @@ def evaluate(debug=False):
                                 print('>>> Notification is persistent.')
                                 print('Eval result:', eval(toEval))
                             if eval(toEval):
+                                if 'pvlist' not in exclude:
+                                    if debug == True:
+                                        print('pvlist:', pvlist_local)
+                                ans = notification2server(pvlist_local, pvpool)
                                 if debug == True:
-                                    print('pvlist:', pvlist_local)
-                                ans = sendnotification(pvlist_local, pvpool)
-                                if debug == True:
-                                    print('sendnotification result:', ans)
+                                    print('notification2server result:', ans)
                                 if ans == 'ok':
                                     log = str(datetime.now()) + ' message to ' + owner + \
                                         ' sent to server. PV: ' + var + '\n\r'
@@ -149,13 +164,14 @@ def evaluate(debug=False):
                             if debug == True:
                                 print('>>> Notification not persistent.')
                             if notification.sent == False: #not sent
+                                evaluation = eval(toEval)
                                 if debug == True:
                                     print('>>> Notification never sent before.')
-                                    print('Eval result:', eval(toEval))
-                                if eval(toEval):
-                                    ans = sendnotification(pvlist_local, pvpool)
+                                    print('Eval result:', evaluation)
+                                if evaluation:
+                                    ans = notification2server(pvlist_local, pvpool)
                                     if debug == True:
-                                        print('sendnotification result:', ans)
+                                        print('notification2server result:', ans)
                                     if ans == 'ok':
                                         log = str(datetime.now()) + ' message to ' + owner + \
                                             ' sent to server. PV: ' + var + '\n\r'
@@ -179,13 +195,14 @@ def evaluate(debug=False):
                                         if debug == True:
                                             print(ans)
                 else: #wasnt sent yet
+                    evaluation = eval(toEval)
                     if debug == True:
                         print('>>> Notification never sent before.')
-                        print('Eval result:', eval(toEval))
-                    if eval(toEval):
-                        ans = sendnotification(pvlist_local, pvpool)
+                        print('Eval result:', evaluation)
+                    if evaluation:
+                        ans = notification2server(pvlist_local, pvpool)
                         if debug == True:
-                            print('sendnotification result:', ans)
+                            print('notification2server result:', ans)
                         if ans == 'ok':
                             log = str(now) + ' message to ' + owner + \
                                 ' sent to server. PV: ' + var + '\n\r'
@@ -212,9 +229,13 @@ def evaluate(debug=False):
         if debug == True:
             l += 1  
             # break   
-
             # if j >= len(notifications_raw) - 1:
             #    print(j)
             # j += 1
-
+exclude = ['iteration',\
+            'pvpool',\
+            'notification',\
+            'testpv',\
+            'pvlist',\
+            '']
 evaluate()
