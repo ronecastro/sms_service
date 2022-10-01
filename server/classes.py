@@ -1,4 +1,4 @@
-import socket, pickle
+import socket, pickle, 
 
 class socketServer:
     def __init__(self, address, debug=False):

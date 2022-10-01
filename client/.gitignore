@@ -1,2 +1,4 @@
-lib/python3.6
 __pycache__
+/lib
+/bin
+/include
