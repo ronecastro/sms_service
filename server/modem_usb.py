@@ -1,4 +1,4 @@
-import serial, time, re
+import serial, time, re, psutil
 
 ##############################################################
 # We need to change permission for the usb file of the modem #
@@ -27,7 +27,7 @@ import serial, time, re
 
 
 class Modem:
-    def __init__(self, path, debug=False):
+    def __init__(self, path='/dev/ttyUSB0', debug=False):
         self.path = path
         self.debug = debug
         self.msgnumber = None
@@ -45,13 +45,13 @@ class Modem:
         while True:
             if quantity > 0:
                 ans += self.serial_connection.read(quantity).decode()
-                print('ans get answer: ', ans)
+                # print('ans get answer: ', ans)
                 time.sleep(sleep)
             else:
                 time.sleep(sleep)
-            print('quantity before:', quantity) 
+            # print('quantity before:', quantity) 
             quantity = self.serial_connection.in_waiting
-            print('quantity after:', quantity) 
+            # print('quantity after:', quantity) 
             if quantity == 0:
                 break
         if self.debug:
@@ -147,7 +147,7 @@ class Modem:
         return ans
 
     def kill_modem_proc(self):
-        for proc in process_iter():
+        for proc in psutil.process_iter():
             if proc.name() == 'ModemManager':
                 proc.kill()
                 print('Modem process killed')
@@ -214,3 +214,7 @@ class Modem:
     def closeconnection(self):
         self.serial_connection.close()
     
+# m = Modem()
+# m.initialize()
+# m.sendsms()
+# m.closeconnection()

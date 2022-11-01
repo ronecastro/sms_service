@@ -14,5 +14,19 @@ def listOfRunningServices():
    
     pass
 
-listOfRunningServices()
+# listOfRunningServices()
 
+def test():
+    data = [('rone.castro', '+5519997397443', 'rone.castro@lnls.br'), 'WARNING!\n\rSI-13C4:DI-DCCT:Current-Mon < 100\n\rLast Value = 64.431416749\n\r']
+
+    owner = data[0][0]
+    phone = data[0][1]
+    msg = data[1]
+
+    print('owner:', owner)
+    print('phone:', phone)
+    print('msg:', msg)
+
+# test()
+
+print('pv = ' + str("%2g" % 0.00000000011 + '\n\r'))

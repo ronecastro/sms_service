@@ -140,7 +140,8 @@ def evaluate(debug=False, exclude=[]):
                                     print('notification2server result:', ans)
                                 if ans == 'ok':
                                     log = str(datetime.now()) + ' message to ' + owner + \
-                                        ' sent to server. PV: ' + var + '\n\r'
+                                        ' sent to server. PV: ' + var + '.\n\r'
+                                    print(log)
                                     fullpath = current_path('log.txt')
                                     r = write(fullpath, log)
                                     if debug == True:
@@ -174,7 +175,8 @@ def evaluate(debug=False, exclude=[]):
                                         print('notification2server result:', ans)
                                     if ans == 'ok':
                                         log = str(datetime.now()) + ' message to ' + owner + \
-                                            ' sent to server. PV: ' + var + '\n\r'
+                                            ' sent to server. PV: ' + var + '.\n\r'
+                                        print(log)
                                         fullpath = current_path('log.txt')
                                         r = write(fullpath, log)
                                         if r != 'ok':
@@ -205,7 +207,8 @@ def evaluate(debug=False, exclude=[]):
                             print('notification2server result:', ans)
                         if ans == 'ok':
                             log = str(now) + ' message to ' + owner + \
-                                ' sent to server. PV: ' + var + '\n\r'
+                                ' sent to server. PV: ' + var + '.\n\r'
+                            print(log)
                             fullpath = current_path('log.txt')
                             r = write(fullpath, log)
                             if r != 'ok':
@@ -238,4 +241,4 @@ exclude = ['iteration',\
             'testpv',\
             'pvlist',\
             '']
-evaluate()
+evaluate(debug=False)

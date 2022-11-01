@@ -6,7 +6,7 @@ app = QApplication([])
 app.setQuitOnLastWindowClosed(False)
   
 # Adding an icon
-icon = QIcon("message.png")
+icon = QIcon("server/message.png")
   
 # Adding item on the menu bar
 tray = QSystemTrayIcon()
@@ -15,10 +15,8 @@ tray.setVisible(True)
   
 # Creating the options
 menu = QMenu()
-option1 = QAction("Geeks for Geeks")
-option2 = QAction("GFG")
-menu.addAction(option1)
-menu.addAction(option2)
+# option1 = QAction("option1")
+# menu.addAction(option1)
   
 # To quit the app
 quit = QAction("Quit")

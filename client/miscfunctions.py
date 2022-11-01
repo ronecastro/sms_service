@@ -97,7 +97,10 @@ def notification2server(pvlist, pvpool):
             sizetrue += 1
     for item in pvlist: #for each pv in pvlist
         if item[0] == True:
+            # print('pvlist', '\n\r', pvlist)
+            # print('item:', '\n\r', item)
             pv = item[1][0] #get pv name
+            pv_ = pvlist[0][1][0]
             rule = item[2] #get rule
             if not 'LL' in rule: #for simple limit
                 L = item[3]
@@ -105,7 +108,7 @@ def notification2server(pvlist, pvpool):
                 if sizetrue <= 2:
                     aux = rule.replace('pv', pv) + '\n\r'
                     aux = aux.replace('L', L)
-                    aux += 'Last Value = ' + str(pvpool[pv][0]) + '\n\r'
+                    aux += 'Last Value = ' + str("%2g" % pvpool[pv][0]) + '\n\r'
                     body += aux
                 else:
                     body = 'Many#\n\r'
@@ -124,7 +127,7 @@ def notification2server(pvlist, pvpool):
                     body = 'Many#\n\r'
     if 'Many#' in body:
         body = 'Many PVs reached their limits!\n\r'
-        body += 'PVs alike: ' + pv + '\n\r'
+        body += 'First PV: ' + pv_ + '\n\r'
     aux = (user.username, user.phone, user.email)
     msg = [aux, header + body]
     ip = str(fromcfg('ADDRESS', 'ip'))
