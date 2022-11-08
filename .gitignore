@@ -1,11 +1,13 @@
-# .vscode/
-# client/__pycache__
-# client/lib
-# client/bin
-# client/lib64
-# client/app/__pycache__
+.vscode/
 
-# server/__pycache__
-# serve/*.pyc
-# server/audio_to_serial_modem_example.py
-# server/test_script.py
+client/__pycache__
+client/*.pyc
+client/bin
+client/lib
+client/lib64
+client/app/__pycache__
+
+server/__pycache__
+server/*.pyc
+server/audio_to_serial_modem_example.py
+server/test_script.py
