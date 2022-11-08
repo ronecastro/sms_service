@@ -6,6 +6,7 @@ client/bin
 client/lib
 client/lib64
 client/app/__pycache__
+client/app/test_script.py
 
 server/__pycache__
 server/*.pyc
