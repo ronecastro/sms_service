@@ -11,3 +11,4 @@ server/__pycache__
 server/*.pyc
 server/audio_to_serial_modem_example.py
 server/test_script.py
+server/icon_test.py
