@@ -20,6 +20,19 @@
     <!-- Custom styles for this template-->
     <link href="{{ url_for('static', filename='css/notificationservice.min.css') }}" rel="stylesheet">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.1.62/jquery.inputmask.bundle.js"></script>
+
+    <script type='text/javascript'>
+        $(document).ready(function($){
+            var phones = [{ "mask": "+55 ## #-####-####"}, { "mask": "+55 ## #-####-####"}];
+            $('#inputValPhone').inputmask({ 
+                mask: phones, 
+                greedy: false, 
+                definitions: { '#': { validator: "[0-9]", cardinality: 1}} 
+                });
+            });
+    </script>
 </head>
 
 <body class="bg-gradient-primary">
@@ -97,9 +110,9 @@
                                                 </div>
                                             </div>
                                             <div class="form-group mb-0">
-                                                {{ form.phone(class="form-control form-control-user" + 
+                                                {{ form.phone(class="form-control form-control-user inputValPhone" + 
                                                     (" is-invalid" if form.phone.errors else ""), placeholder="Phone Number", 
-                                                    id="inputValPhone", size=32, **{"aria-describedby": "inputValPhone", 
+                                                    id="inputValPhone", size=32, type="", **{"aria-describedby": "inputValPhone", 
                                                     "required": ""}) }}
                                             </div>
                                             <div class="mb-3">

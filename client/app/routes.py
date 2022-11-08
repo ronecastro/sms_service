@@ -107,7 +107,8 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm("0") # any argument to satisfy init function
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, phone=form.phone.data)
+        phone=(form.phone.data).replace("-","").replace(" ","")
+        user = User(username=form.username.data, email=form.email.data, phone=phone)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

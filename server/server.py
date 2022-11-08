@@ -26,6 +26,7 @@ def on_new_client(sock, connection, client_address, queue):
                 client_address[0] == ip3 or 
                 client_address[0] == ip4):
                 data = sock.receive_data(connection, echo=True)
+                # print('data', data)
                 if not 'error' in data:
                     queue.put(data) #increment queue
                     sleep(1)
@@ -59,9 +60,9 @@ def server(sock, queue, exit):
         if exit.value:
             break
         else:
-            # print('connection started')
+            print('connection started')
             connection, client_address = sock.accept_connection()
-            # print('connection accepted')
+            print('connection accepted')
             try:
                 p = Process(name='notificationserver-spawn', target=on_new_client, \
                     args=(sock, connection, client_address, queue))
@@ -82,18 +83,19 @@ def watcherseye(queue, exit):
         if exit.value:
             # print('exit watcherseye')
             _exit(0)
-        sleep(2)
-        if queue.empty() == False:
-            data = queue.get_nowait()
-            print('watcherseye queue:', data)
-            owner = data[0][0]
-            phone = data[0][1]
-            email = data[0][2]
-            msg = data[1]
-            # m = Modem()
-            # m.initialize()
-            # m.sendsms(number=phone, msg=msg)
-            # m.closeconnection()
+        else:
+            sleep(2)
+            if queue.empty() == False:
+                data = queue.get_nowait()
+                print('watcherseye queue:', data)
+                owner = data[0][0]
+                phone = data[0][1]
+                email = data[0][2]
+                msg = data[1]
+                # m = Modem()
+                # m.initialize()
+                # m.sendsms(number=phone, msg=msg)
+                # m.closeconnection()
 
 def search(list, pname):
     pnum = 0
@@ -113,9 +115,10 @@ def handler(signum, frame):
     port = int(fromcfg("ADDRESS", "port"))
     if 'error' in (ip or port):
         raise Exception('error on ip or port')
+    exit.value = True
+    sleep(1)
     addr = (ip, port)
     ans = gsock.connect(addr)
-    exit.value = True
     # print('handler ans', ans)
     sleep(1)
     _exit(0)
@@ -145,8 +148,8 @@ def main():
     except Exception as e:
         return 'error on starting the socket', e
     q = Queue()
-    # p1 = Process(name=proc, target=icon, args=(gexit,))
-    # p1.start()
+    # p* = Process(name=proc, target=icon, args=(gexit,))
+    # p*.start()
     p1 = Process(name='notificationserver', target=server, args=(gsock, q, gexit,))
     p1.start()
     p2 = Process(name='watcherseye', target=watcherseye, args=(q, gexit,))

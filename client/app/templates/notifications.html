@@ -22,6 +22,8 @@
                 var rule = row.insertCell(4);
                 var limit = row.insertCell(5);
                 var subrule = row.insertCell(6);
+                var interval = row.insertCell(7);
+                var persistence = row.insertCell(8);
             '{%else%}'
                 var id = row.insertCell(0)
                 var expiration = row.insertCell(1);
@@ -29,6 +31,8 @@
                 var rule = row.insertCell(3);
                 var limit = row.insertCell(4);
                 var subrule = row.insertCell(5);
+                var interval = row.insertCell(6);
+                var persistence = row.insertCell(7);
             '{%endif%}'
             var n = '{{notification.notification}}';
             obj = toJson(n);
@@ -41,9 +45,9 @@
                 select.innerHTML = "<td><input name='checkbox[]' class='cb' type='checkbox' \
                                     name='checkbox[]' value='{{notification.id}}' \
                                     id='{{notification.id}}'>{%if current_user.username=='admin'%}\
-                                    id = {{notification.id}}{%endif%}</td>";
+                                    {%endif%}</td>";
                 id.innerHTML = '{{notification.id}}';
-                //console.log(obj)
+                console.log(obj)
                 expiration.innerHTML = obj.expiration;
                 pv.innerHTML = obj.notificationCores[len-1].notificationCore0.pv;
                 rule.innerHTML = obj.notificationCores[len-1].notificationCore0.rule;
@@ -57,6 +61,8 @@
                     limit.innerHTML = 'L = ' + obj.notificationCores[0].notificationCore0.limit;
                 }
                 subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
+                interval.innerHTML = obj.interval;
+                persistence.innerHTML = obj.persistence;
                 '{%else%}'
                 id.innerHTML = '{{notification.id}}';
                 expiration.innerHTML = obj.expiration;
@@ -72,6 +78,8 @@
                     limit.innerHTML = 'L = ' + obj.notificationCores[0].notificationCore0.limit;
                 }
                 subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
+                interval.innerHTML = obj.interval;
+                persistence.innerHTML = obj.persistence;
                 '{%endif%}'
             }
             //se tamanho da array de notificações > 1
@@ -123,7 +131,7 @@
                     select.innerHTML = "<td><input name='checkbox[]' class='cb' type='checkbox' \
                                         name='checkbox[]' value='{{notification.id}}' \
                                         id='{{notification.id}}'>{%if current_user.username=='admin'%}\
-                                        id = {{notification.id}}{%endif%}</td>";
+                                        {%endif%}</td>";
                     id.innerHTML = '{{notification.id}}';
                     expiration.innerHTML = obj.expiration;
                     pv.innerHTML += obj.notificationCores[j][nC][nP] + '<br/>';
@@ -136,6 +144,8 @@
                         limit.innerHTML += 'L = ' + obj.notificationCores[j][nC][nLimit] + '<br/>';
                     }
                     subrule.innerHTML += obj.notificationCores[j][nC][nSubrule] + '<br/>';
+                    interval.innerHTML = obj.interval;
+                    persistence.innerHTML = obj.persistence;
                     '{%else%}'
                     id.innerHTML = '{{notification.id}}';
                     expiration.innerHTML = obj.expiration;
@@ -149,6 +159,8 @@
                         limit.innerHTML += 'L = ' + obj.notificationCores[j][nC][nLimit] + '<br/>';
                     }
                     subrule.innerHTML += obj.notificationCores[j][nC][nSubrule] + '<br/>';
+                    interval.innerHTML = obj.interval;
+                    persistence.innerHTML = obj.persistence;
                     '{%endif%}'
                 }
             }
@@ -173,12 +185,16 @@
                                 <th>Rule</th>
                                 <th>Limit</th>
                                 <th>Subrule</th>
+                                <th>Interval</th>
+                                <th>Persistence</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% if current_user.is_authenticated %}
                             <td style="display:none"></td>
                             {%endif%}
+                            <td style="display:none"></td>
+                            <td style="display:none"></td>
                             <td style="display:none"></td>
                             <td style="display:none"></td>
                             <td style="display:none"></td>
