@@ -4,3 +4,4 @@ __pycache__
 /bin
 /include
 log.txt
+/app/db/db/app.db
