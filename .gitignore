@@ -8,6 +8,7 @@ client/lib64
 client/app/__pycache__
 client/app/test_script.py
 client/app/db/db/get_old_db.py
+client/app/db/db/notifications.db
 
 server/__pycache__
 server/*.pyc

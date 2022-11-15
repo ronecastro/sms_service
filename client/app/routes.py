@@ -228,9 +228,14 @@ def notifications_add():
             errors.append('limit')
             emsg += 'Limit must be numeric! '
         if len(errors) == 0:
+            user_db = db.session.query(User).filter_by(username=user.username).first()
+            user_id = user_db.id
+            print('user_id:\n\r', user_id.id)
             notification = Notification(
-                user_id = user.id,
+                user_id = user_id,
                 notification=requestJson)
+            print('user:\n\r', user)
+            print('notification:\n\r', notification)
             db.session.add(notification)
             db.session.commit()
             flash('Notification added!', 'success')
