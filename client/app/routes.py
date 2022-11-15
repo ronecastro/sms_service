@@ -252,6 +252,7 @@ def notifications_edit(id):
         action = request.form
         requestJson = json.dumps(request.get_json(force=True))
         requestJson_load = json.loads(requestJson)
+        # print(requestJson_load)
         expiration = requestJson_load['expiration']
         interval = requestJson_load['interval']
         pv = requestJson_load['notificationCores'][0]['notificationCore0']['pv']
@@ -280,9 +281,8 @@ def notifications_edit(id):
             notification.notification = requestJson
             db.session.commit()
             flash("Notification edited sucessfully!", "success")
-            return redirect(url_for('notifications'))
+            return url_for('notifications')
         else:
-            emsg += 'Interval minimum is 10 minutes! '
             r = ({'warning': True}, 205, {'ContentType':'application/text'}) #tuple response format
             flash(emsg, 'warning')
             return r
@@ -374,3 +374,23 @@ def rules_edit(id):
     session['last_url'] = url_for('rules_edit', id=id)
     session['login_required'] = True
     return render_template('rules-edit.html', form=form, rule=rule, title='Rules Configuration')
+
+# Many PVs
+# {
+# 'created': '2022-11-15 17:02', 'expiration': '2022-11-01 10:55', 'interval': '61', 'persistence': 'YES', 
+# 'notificationCores': 
+# [
+# {'notificationCore0': {'pv': '^LA-VA:H1VGC-02:RdPrs-2$', 'rule': 'pv < L', 'limit': '1e-8', 'subrule': 'OR'}}, 
+# {'notificationCore1': {'pv1': '^LA-VA:H1VGC-03:RdPrs-1$', 'rule1': 'pv > L', 'limit1': '1e-8', 'subrule1': 'OR'}}, 
+# {'notificationCore2': {'pv2': '^LA-VA:H1VGC-02:RdPrs-1$', 'rule2': 'pv > L', 'limit2': '1e-8', 'subrule2': ''}}
+# ]
+# }
+
+# One PV
+# {
+# 'created': '2022-11-15 17:05', 'expiration': '2022-11-30 14:00', 'interval': '59', 'persistence': 'YES', 
+# 'notificationCores': 
+# [
+# {'notificationCore0': {'pv': '^([T][S])(.+VA-CCG.+Pressure-Mon)$', 'rule': 'pv > L', 'limit': '1e-8', 'subrule': ''}}
+# ]
+# }
