@@ -47,7 +47,7 @@
                                     id='{{notification.id}}'>{%if current_user.username=='admin'%}\
                                     {%endif%}</td>";
                 id.innerHTML = '{{notification.id}}';
-                console.log(obj)
+                // console.log(obj)
                 expiration.innerHTML = obj.expiration;
                 pv.innerHTML = obj.notificationCores[len-1].notificationCore0.pv;
                 rule.innerHTML = obj.notificationCores[len-1].notificationCore0.rule;

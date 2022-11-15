@@ -214,26 +214,26 @@ function submitForm(e, op, id=NaN){
     notification["notificationCores"] = notificationJSON;
     var formData = JSON.stringify(notification);
     var xhr = new XMLHttpRequest();
+    sessionStorage.setItem("expiration", $('#datetimepicker5').val());
+    var expiration = sessionStorage.getItem("expiration");
+    sessionStorage.setItem("interval", $('#interval').val());
+    var interval = sessionStorage.getItem("interval");
+    sessionStorage.setItem("persistence", $('#persistence').val());
+    var persistence = sessionStorage.getItem("persistence");
+    sessionStorage.setItem("pv", $('#pv').val());
+    var pv = sessionStorage.getItem("pv");
+    sessionStorage.setItem("rule", $('#rule').val());
+    var rule = sessionStorage.getItem("rule");
+    sessionStorage.setItem("limit", $('#limit').val());
+    var limit = sessionStorage.getItem("limit");
+    sessionStorage.setItem("limitLL", $('#limitLL').val());
+    var limitLL = sessionStorage.getItem("limitLL");
+    sessionStorage.setItem("limitLU", $('#limitLU').val());
+    var limitLU = sessionStorage.getItem("limitLU");
+    sessionStorage.setItem("subrule", $('#subrule').val());
+    var subrule = sessionStorage.getItem("subrule");
+    sessionStorage.setItem('reload', 'true')
     if (op == 'add'){
-        sessionStorage.setItem("expiration", $('#datetimepicker5').val());
-        var expiration = sessionStorage.getItem("expiration");
-        sessionStorage.setItem("interval", $('#interval').val());
-        var interval = sessionStorage.getItem("interval");
-        sessionStorage.setItem("persistence", $('#persistence').val());
-        var persistence = sessionStorage.getItem("persistence");
-        sessionStorage.setItem("pv", $('#pv').val());
-        var pv = sessionStorage.getItem("pv");
-        sessionStorage.setItem("rule", $('#rule').val());
-        var rule = sessionStorage.getItem("rule");
-        sessionStorage.setItem("limit", $('#limit').val());
-        var limit = sessionStorage.getItem("limit");
-        sessionStorage.setItem("limitLL", $('#limitLL').val());
-        var limitLL = sessionStorage.getItem("limitLL");
-        sessionStorage.setItem("limitLU", $('#limitLU').val());
-        var limitLU = sessionStorage.getItem("limitLU");
-        sessionStorage.setItem("subrule", $('#subrule').val());
-        var subrule = sessionStorage.getItem("subrule");
-        sessionStorage.setItem('reload', 'true')
         xhr.open("POST", "/sms_service/notifications/add", true);
         xhr.send(formData); 
         xhr.onload = function() {
@@ -263,6 +263,17 @@ function submitForm(e, op, id=NaN){
         xhr.onload = function() {
         if (xhr.status == 200){
             window.location.href = "/sms_service/notifications"; }
+        else {
+            window.location.reload(); 
+            document.getElementById("datetimepicker5").setAttribute('value', expiration);
+            document.getElementById("interval").value = interval;
+            document.getElementById("persistence").value = persistence;
+            document.getElementById("pv").value = pv;
+            document.getElementById("rule").value = rule;
+            document.getElementById("limit").value = limit;
+            document.getElementById("limitLL").value = limitLL;
+            document.getElementById("limitLU").value = limitLU;
+            document.getElementById("subrule").value = subrule; }
         }
     }
     else {

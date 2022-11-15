@@ -166,14 +166,13 @@
             <label class="col-sm-12 col-form-label">Interval(minutes):</label>
         </div>
         <div class="col-sm-1">
-            <input type="text" class="form-control" value='60' autocomplete="off"
-            name="interval">
+            <input type="number" id="interval" class="form-control" name="interval">
         </div>
         <div class="col-sm-1.5">
             <label class="col-sm-12 col-form-label">Persistence:</label>
         </div>
         <div class="col-sm-1">
-            <select class="form-control" id="subrule" autocomplete="off" name="persistence">
+            <select class="form-control" id="persistence" autocomplete="off" name="persistence">
                 <option value="YES">YES</option>
                 <option value="NO" selected='selected'>NO</option>
             </select>
@@ -255,7 +254,7 @@
             </div>
         </div>
         <span>
-            <button class="btn btn-primary btn-user" type="submit" name='action' value='submit' 
+            <button class="btn btn-primary btn-user" type="submit" name='action' value="submit"
                 onClick="submitForm(this, 'edit', '{{notification[0].id}}')">Submit</button>
 
             <button class="btn btn-primary btn-user" type="cancel" name='action' value='cancel' 

@@ -215,6 +215,9 @@ def notifications_add():
         if not interval.isnumeric:
             errors.append('interval')
             emsg += 'Interval must be numeric! '
+        if int(interval) < 10:
+            errors.append('interval')
+            emsg += 'Interval minimum is 10 minutes! '
         if not pv:
             errors.append('pv')
             emsg += 'Set PV! '
@@ -243,14 +246,46 @@ def notifications_add():
 @app.route('/notifications/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def notifications_edit(id):
+    errors = []
+    emsg = ''
     if request.method == "POST":
         action = request.form
         requestJson = json.dumps(request.get_json(force=True))
-        notification = db.session.query(Notification).filter_by(id=id).first()
-        notification.notification = requestJson
-        db.session.commit()
-        flash("Notification edited sucessfully!", "success")
-        return redirect(url_for('notifications'))
+        requestJson_load = json.loads(requestJson)
+        expiration = requestJson_load['expiration']
+        interval = requestJson_load['interval']
+        pv = requestJson_load['notificationCores'][0]['notificationCore0']['pv']
+        rule = requestJson_load['notificationCores'][0]['notificationCore0']['rule']
+        limit = requestJson_load['notificationCores'][0]['notificationCore0']['limit']
+        if not expiration:
+            errors.append('expiration')
+            emsg += 'Set expiration! '
+        if not interval.isnumeric:
+            errors.append('interval')
+            emsg += 'Interval must be numeric! '
+        if int(interval) < 10:
+            errors.append('interval')
+            emsg += 'Interval minimum is 10 minutes! '
+        if not pv:
+            errors.append('pv')
+            emsg += 'Set PV! '
+        if not rule:
+            errors.append('rule')
+            emsg += "Set rule! "
+        if not limit.isnumeric():
+            errors.append('limit')
+            emsg += 'Limit must be numeric! '
+        if int(interval) >= 10:
+            notification = db.session.query(Notification).filter_by(id=id).first()
+            notification.notification = requestJson
+            db.session.commit()
+            flash("Notification edited sucessfully!", "success")
+            return redirect(url_for('notifications'))
+        else:
+            emsg += 'Interval minimum is 10 minutes! '
+            r = ({'warning': True}, 205, {'ContentType':'application/text'}) #tuple response format
+            flash(emsg, 'warning')
+            return r
     rules = db.session.query(Rule).all()
     notification = db.session.query(Notification).filter_by(id=id).all()
     session['last_url'] = url_for('notifications_edit', id=id)
