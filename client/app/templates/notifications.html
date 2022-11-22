@@ -11,7 +11,7 @@
         the Rule evaluates to True.</p>
     <script>
         window.onload = function(){
-        {%for notification in notifications%}
+        '{%for notification in notifications%}'
             var table = document.getElementById("dataTable");
             var row = table.insertRow(table.rows.length);
             '{% if current_user.is_authenticated %}'
@@ -37,8 +37,8 @@
             var n = '{{notification.notification}}';
             obj = toJson(n);
             nCores = obj.notificationCores;
-
             var len = obj.notificationCores.length;
+            console.log('len', len)
             //se tamanho da array de notificacoes <= 1
             if (len == 1){
                 '{% if current_user.is_authenticated %}'
@@ -47,19 +47,14 @@
                                     id='{{notification.id}}'>{%if current_user.username=='admin'%}\
                                     {%endif%}</td>";
                 id.innerHTML = '{{notification.id}}';
-                // console.log(obj)
+                console.log(obj)
                 expiration.innerHTML = obj.expiration;
                 pv.innerHTML = obj.notificationCores[len-1].notificationCore0.pv;
                 rule.innerHTML = obj.notificationCores[len-1].notificationCore0.rule;
                 //console.log('notificationCores', obj.notificationCores[j]);
-                rule_ = obj.notificationCores[0].notificationCore0.rule;
-                if (rule_.includes('LL')){
-                    limit.innerHTML += 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
-                        'LU = ' + obj.notificationCores[0].notificationCore0['limitLU'] + '<br/>';
-                }
-                else{
-                    limit.innerHTML = 'L = ' + obj.notificationCores[0].notificationCore0.limit;
-                }
+                // console.log('rule', rule)
+                console.log('obj', obj.notificationCores[0].notificationCores[0].notificationCore0)
+                rule_ = obj.notificationCores[0].notificationCores[0].notificationCore0.limit;
                 subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
                 interval.innerHTML = obj.interval;
                 persistence.innerHTML = obj.persistence;
@@ -73,10 +68,10 @@
                 if (rule_.includes('LL')){
                     limit.innerHTML += 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
                         'LU = ' + obj.notificationCores[0].notificationCore0['limitLU'] + '<br/>';
-                }
+                    }
                 else{
                     limit.innerHTML = 'L = ' + obj.notificationCores[0].notificationCore0.limit;
-                }
+                    }
                 subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
                 interval.innerHTML = obj.interval;
                 persistence.innerHTML = obj.persistence;
@@ -84,30 +79,30 @@
             }
             //se tamanho da array de notificações > 1
             else {
+                console.log('array > 1')
                 for (var j=0; j < len; j+=1){
-                    var nC = 'notificationCore' + j;
-                    if (j > 0){
-                        var nL = 'limit';
-                    }
-                    else {
-                        var nL = 'limit';
-                    }
-                    //console.log('nC', nC);
+                    var nC = 'notificationCore' + j.toString();
+                    // console.log(nC)
+                    // if (j > 0){
+                    //     var nL = 'limit';
+                    // }
+                    // else {
+                    //     var nL = 'limit';
+                    // }
+                    // console.log('nC', nC);
                     var notification = obj.notificationCores[j][nC];
                     var notification_str = JSON.stringify(notification);
-                    //console.log('notification', notification);
+                    // console.log('notification', notification);
                     if (typeof notification_str == 'string'){
                         if (notification_str.includes('limitLL')){
-                            if (j > 0){
-                                var nL = 'limitLL';
-                            }
-                            else {
-                                var nL = 'limit';
-                            }
-                            //console.log('contains LL', nL);
+                            // console.log('includes LL')
+                            // console.log(pv)
+                            // Ler var rules e definir se há limitLL ou somente limit, setar var nL
+                            var nL = 'limitLL';
                         }
                         else{
                             //console.log('do not contains LL', nL);
+                            var nL = 'limit';
                         }
                     }
                     nC = 'notificationCore' + j;
@@ -136,6 +131,7 @@
                     expiration.innerHTML = obj.expiration;
                     pv.innerHTML += obj.notificationCores[j][nC][nP] + '<br/>';
                     rule.innerHTML += obj.notificationCores[j][nC][nR] + '<br/>';
+                    console.log(nL)
                     if (nL == 'limitLL'){
                         limit.innerHTML += 'LL = ' + obj.notificationCores[j][nC][nLimitLL] + ' // ' +
                             'LU = ' + obj.notificationCores[j][nC][nLimitLU] + '<br/>';
@@ -164,9 +160,10 @@
                     '{%endif%}'
                 }
             }
-        {%endfor%}
+        '{%endfor%}'
         //console.log(limit)
         }
+        
     </script>
     <!-- DataTales Example -->
     <form action="" action='{{url_for("notifications")}}' method="POST" style="display:inline-block;overflow-x:auto;">

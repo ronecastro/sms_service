@@ -212,6 +212,7 @@ function submitForm(e, op, id=NaN){
     notification["interval"] = interval.value;
     notification["persistence"] = persistence.value;
     notification["notificationCores"] = notificationJSON;
+    nclen = notification["notificationCores"].length
     var formData = JSON.stringify(notification);
     var xhr = new XMLHttpRequest();
     sessionStorage.setItem("expiration", $('#datetimepicker5').val());
@@ -221,6 +222,9 @@ function submitForm(e, op, id=NaN){
     sessionStorage.setItem("persistence", $('#persistence').val());
     var persistence = sessionStorage.getItem("persistence");
     sessionStorage.setItem("pv", $('#pv').val());
+    // for (let i = 0; i < nclen.length; i++) {
+    //     text += nclen[i];
+    //   } 
     var pv = sessionStorage.getItem("pv");
     sessionStorage.setItem("rule", $('#rule').val());
     var rule = sessionStorage.getItem("rule");
@@ -265,6 +269,7 @@ function submitForm(e, op, id=NaN){
             window.location.href = "/sms_service/notifications"; }
         else {
             window.location.reload(); 
+            // console.log('nc', notification["notificationCores"].length)
             document.getElementById("datetimepicker5").setAttribute('value', expiration);
             document.getElementById("interval").value = interval;
             document.getElementById("persistence").value = persistence;
