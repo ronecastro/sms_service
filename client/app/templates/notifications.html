@@ -38,32 +38,33 @@
             obj = toJson(n);
             nCores = obj.notificationCores;
             var len = obj.notificationCores.length;
-            console.log('len', len)
+            // console.log('len', len)
             //se tamanho da array de notificacoes <= 1
             if (len == 1){
+                // console.log('array == 1')
                 '{% if current_user.is_authenticated %}'
                 select.innerHTML = "<td><input name='checkbox[]' class='cb' type='checkbox' \
                                     name='checkbox[]' value='{{notification.id}}' \
                                     id='{{notification.id}}'>{%if current_user.username=='admin'%}\
                                     {%endif%}</td>";
                 id.innerHTML = '{{notification.id}}';
-                console.log(obj)
+                // console.log(obj)
                 expiration.innerHTML = obj.expiration;
                 pv.innerHTML = obj.notificationCores[len-1].notificationCore0.pv;
                 rule.innerHTML = obj.notificationCores[len-1].notificationCore0.rule;
-                //console.log('notificationCores', obj.notificationCores[j]);
+                // console.log('notificationCores', obj.notificationCores[0]);
                 // console.log('rule', rule)
-                console.log('obj', obj.notificationCores[0].notificationCores[0].notificationCore0)
-                rule_ = obj.notificationCores[0].notificationCores[0].notificationCore0.limit;
+                // console.log('obj', obj.notificationCores[0].notificationCore0.rule)
+                rule_ = obj.notificationCores[0].notificationCore0.rule;
                 subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
                 interval.innerHTML = obj.interval;
                 persistence.innerHTML = obj.persistence;
                 '{%else%}'
+                // console.log(obj)
                 id.innerHTML = '{{notification.id}}';
                 expiration.innerHTML = obj.expiration;
                 pv.innerHTML = obj.notificationCores[0].notificationCore0.pv;
-                rule.innerHTML = obj.notificationCores[0].notificationCore0.rule;
-                //console.log('notificationCores', obj.notificationCores[0]);
+                // console.log('notificationCores', obj.notificationCores[0]);
                 rule_ = obj.notificationCores[0].notificationCore0.rule;
                 if (rule_.includes('LL')){
                     limit.innerHTML += 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
@@ -79,10 +80,9 @@
             }
             //se tamanho da array de notificações > 1
             else {
-                console.log('array > 1')
+                // console.log('array > 1')
                 for (var j=0; j < len; j+=1){
                     var nC = 'notificationCore' + j.toString();
-                    // console.log(nC)
                     // if (j > 0){
                     //     var nL = 'limit';
                     // }
@@ -131,7 +131,7 @@
                     expiration.innerHTML = obj.expiration;
                     pv.innerHTML += obj.notificationCores[j][nC][nP] + '<br/>';
                     rule.innerHTML += obj.notificationCores[j][nC][nR] + '<br/>';
-                    console.log(nL)
+                    // console.log(nL)
                     if (nL == 'limitLL'){
                         limit.innerHTML += 'LL = ' + obj.notificationCores[j][nC][nLimitLL] + ' // ' +
                             'LU = ' + obj.notificationCores[j][nC][nLimitLU] + '<br/>';
