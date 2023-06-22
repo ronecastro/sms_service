@@ -118,7 +118,7 @@ def evaluate(debug=False, exclude=[]):
                 notification.sent = False
             interval = timedelta(minutes=int(notification.interval))
             now = datetime.now()
-            if now <= notification.expiration: #if notification didnt expire
+            if now <= notification.expiration: # if notification didnt expire
                 if debug == True:
                     print(">>> Notification didn't expire.")
                 var = pvlist_local[0][1][0]
@@ -230,8 +230,8 @@ def evaluate(debug=False, exclude=[]):
                                 print(ans)
         sleep(10)
         if debug == True:
-            l += 1  
-            # break   
+            l += 1
+            # break
             # if j >= len(notifications_raw) - 1:
             #    print(j)
             # j += 1

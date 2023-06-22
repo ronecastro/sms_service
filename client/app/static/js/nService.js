@@ -8,11 +8,12 @@ function selectRule(e){
     var elemLimit = contentDiv.children[2].children[1].children[0];
     var elemLimitLL = contentDiv.children[3].children[1].children[0];
     var elemLimitLU = contentDiv.children[3].children[3].children[0];
-    var oldLimitValue = $('#limit').data('old');
-    var oldLimitLLValue = $('#limitLL').data('old');
-    var oldLimitLUValue = $('#limitLU').data('old');
+    // var oldLimitValue = $('#limit').data('old');
+    // var oldLimitLLValue = $('#limitLL').data('old');
+    // var oldLimitLUValue = $('#limitLU').data('old');
     var strRule = e.options[e.selectedIndex].text;
     if(strRule.includes('LL')){
+        elemLimit.value = '';
         elemLimit.setAttribute('show', 'off');
         limitSimple.style.visibility = "hidden";
         limitSimple.style.display = "none";
@@ -20,13 +21,15 @@ function selectRule(e){
         elemLimitLU.setAttribute('show', 'on');
         limitComposite.style.visibility = "visible";
         limitComposite.style.display = "";
-        elemLimitLU.value = oldLimitLUValue || '';
-        elemLimitLL.value = oldLimitLLValue || '';
+        // elemLimitLU.value = oldLimitLUValue || '';
+        // elemLimitLL.value = oldLimitLLValue || '';
         elemLimitLU.hidden=false;
         elemLimitLL.hidden=false;
         elemLimit.hidden=true;
         }
     else {
+        elemLimitLU.value = '';
+        elemLimitLL.value = '';
         elemLimit.setAttribute('show', 'on');
         limitSimple.style.visibility = "visible";
         limitSimple.style.display = "";
@@ -34,7 +37,7 @@ function selectRule(e){
         elemLimitLU.setAttribute('show', 'off');
         limitComposite.style.visibility = "hidden";
         limitComposite.style.display = "none";
-        elemLimit.value = oldLimitValue || '';
+        // elemLimit.value = oldLimitValue || '';
         elemLimitLU.hidden=true;
         elemLimitLL.hidden=true;
         elemLimit.hidden=false;
@@ -97,10 +100,13 @@ function cloneDiv(parentDiv, activeCoreIndex=0){
     rule.setAttribute('name', 'rule' + (Number(activeCoreIndex) + 1).toString());
     limit.setAttribute('id', 'limit' + (Number(activeCoreIndex) + 1).toString());
     limit.setAttribute('name', 'limit' + (Number(activeCoreIndex) + 1).toString());
-    limitLL.setAttribute('id', 'limitLL' + (Number(activeCoreIndex) + 1).toString());
-    limitLL.setAttribute('name', 'limitLL' + (Number(activeCoreIndex) + 1).toString());
-    limitLU.setAttribute('id', 'limitLU' + (Number(activeCoreIndex) + 1).toString());
-    limitLU.setAttribute('name', 'limitLU' + (Number(activeCoreIndex) + 1).toString());
+    limit.setAttribute('title', '');
+    limitLL.setAttribute('id', 'limit_LL' + (Number(activeCoreIndex) + 1).toString());
+    limitLL.setAttribute('name', 'limit_LL' + (Number(activeCoreIndex) + 1).toString());
+    limitLL.setAttribute('title', '');
+    limitLU.setAttribute('id', 'limit_LU' + (Number(activeCoreIndex) + 1).toString());
+    limitLU.setAttribute('name', 'limit_LU' + (Number(activeCoreIndex) + 1).toString());
+    limitLU.setAttribute('title', '');
     subrule.setAttribute('id', 'subrule' + (Number(activeCoreIndex) + 1).toString());
     subrule.setAttribute('name', 'subrule' + (Number(activeCoreIndex) + 1).toString());
     container.appendChild(clonedDiv);
@@ -120,6 +126,41 @@ function changeSubrule(e){
         }
     }
 }
+
+function gethint(e){
+    var aux = (e.id).split('limit')[1]
+    if (aux == '') {
+        var elem = "[id^='pv']"
+    }
+    else {
+        var elem = "[id^='pv" + aux + "']"
+    }
+    $.ajax({
+        type: "GET",
+        url: "/sms_service/gethint",
+        data: {pv: $(elem).val()},
+        success: function(data) {
+            if (data == 'None') {
+                $("[id^=limit]").tooltip({ items: ':not(.menu)' })}
+            else {
+                $("[id^=limit" + aux + "]").attr('title', data)};
+            }
+        });
+    }
+
+function autocomplete(e){
+    $(e).autocomplete({
+        source:function(request,response){
+            $.getJSON("{{url_for('autocomplete')}}",{
+                q: request.term, // in flask, "q" will be the argument to look for using request.args
+                },
+            function(data) {
+                response(data.matching_results.slice(0,500)); // matching_results from jsonify
+                    }
+                );
+            }
+        })
+    }
 
 function closeDiv(e){
     parentDivButton = e.parentElement;
@@ -149,19 +190,19 @@ function closeDiv(e){
     }
 
 function getDateTime() {
-    var now     = new Date(); 
+    var now     = new Date();
     var year    = now.getFullYear();
-    var month   = now.getMonth()+1; 
+    var month   = now.getMonth()+1;
     var day     = now.getDate();
     var hour    = now.getHours();
     var minute  = now.getMinutes();
-    var second  = now.getSeconds(); 
+    var second  = now.getSeconds();
     if(month.toString().length == 1) {
             month = '0'+month;
     }
     if(day.toString().length == 1) {
             day = '0'+day;
-    }   
+    }
     if(hour.toString().length == 1) {
             hour = '0'+hour;
     }
@@ -170,8 +211,8 @@ function getDateTime() {
     }
     if(second.toString().length == 1) {
             second = '0'+second;
-    }   
-    var dateTime = year+'-'+month+'-'+day+' '+hour+':'+minute;   
+    }
+    var dateTime = year+'-'+month+'-'+day+' '+hour+':'+minute;
         return dateTime;
 }
 
@@ -180,10 +221,10 @@ function submitForm(e, op, id=NaN){
     var form = e.parentElement.parentElement; //form
     var container = form.children[0];
     var notification = {
-        created: {}, 
-        expiration: {}, 
-        interval: {}, 
-        persistence: {}, 
+        created: {},
+        expiration: {},
+        interval: {},
+        persistence: {},
         notificationCores: {}
         };
     var notificationJSON = [];
@@ -213,6 +254,7 @@ function submitForm(e, op, id=NaN){
     notification["persistence"] = persistence.value;
     notification["notificationCores"] = notificationJSON;
     nclen = notification["notificationCores"].length
+    console.log(notification)
     var formData = JSON.stringify(notification);
     var xhr = new XMLHttpRequest();
     sessionStorage.setItem("expiration", $('#datetimepicker5').val());
@@ -224,7 +266,7 @@ function submitForm(e, op, id=NaN){
     sessionStorage.setItem("pv", $('#pv').val());
     // for (let i = 0; i < nclen.length; i++) {
     //     text += nclen[i];
-    //   } 
+    //   }
     var pv = sessionStorage.getItem("pv");
     sessionStorage.setItem("rule", $('#rule').val());
     var rule = sessionStorage.getItem("rule");
@@ -239,7 +281,7 @@ function submitForm(e, op, id=NaN){
     sessionStorage.setItem('reload', 'true')
     if (op == 'add'){
         xhr.open("POST", "/sms_service/notifications/add", true);
-        xhr.send(formData); 
+        xhr.send(formData);
         xhr.onload = function() {
             if (xhr.status == 200){
                 window.location.href = "/sms_service/notifications"; }
@@ -250,7 +292,7 @@ function submitForm(e, op, id=NaN){
                 document.getElementById("persistence").value = persistence;
                 document.getElementById("pv").value = pv;
                 document.getElementById("rule").value = rule;
-                document.getElementById("limit").value = limit;
+                document.getElementById("limit_").value = limit;
                 document.getElementById("limitLL").value = limitLL;
                 document.getElementById("limitLU").value = limitLU;
                 document.getElementById("subrule").value = subrule;
@@ -263,19 +305,19 @@ function submitForm(e, op, id=NaN){
     else if (op == 'edit'){
         xhr.open("POST", "/sms_service/notifications/edit/"+id, true);
         xhr.setRequestHeader('notification_id', id);
-        xhr.send(formData); 
+        xhr.send(formData);
         xhr.onload = function() {
         if (xhr.status == 200){
             window.location.href = "/sms_service/notifications"; }
         else {
-            window.location.reload(); 
+            window.location.reload();
             // console.log('nc', notification["notificationCores"].length)
             document.getElementById("datetimepicker5").setAttribute('value', expiration);
             document.getElementById("interval").value = interval;
             document.getElementById("persistence").value = persistence;
             document.getElementById("pv").value = pv;
             document.getElementById("rule").value = rule;
-            document.getElementById("limit").value = limit;
+            document.getElementById("limit_").value = limit;
             document.getElementById("limitLL").value = limitLL;
             document.getElementById("limitLU").value = limitLU;
             document.getElementById("subrule").value = subrule; }
@@ -302,4 +344,3 @@ function JsonToForm(data){
             $('[name='+key+']').val(data[key]);
         }
     }
-

@@ -9,6 +9,7 @@ from app.forms import LoginForm, RegistrationForm, RuleForm, NotificationForm
 from datetime import datetime
 import json, re
 from dbfunctions import searchdb
+from miscfunctions import get_enum_list
 
 #primary light blue
 #secondary light grey
@@ -22,6 +23,16 @@ from dbfunctions import searchdb
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     return searchdb(request.args.get('q'))
+
+@app.route('/gethint', methods=['GET'])
+def gethint():
+    if request.method == 'GET':
+        pv = request.args['pv']
+        if pv:
+            hint = get_enum_list(pv)
+            return str(hint)
+        else:
+            return 'None'
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
@@ -72,8 +83,12 @@ def login():
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password!', 'warning')
             return redirect(url_for('index'))
+        try:
+            session['_flashes'].clear()
+        except Exception as e:
+            pass
         login_user(user, remember=form.remember_me.data)
-        session['_flashes'].clear()
+        session['last_url'] = '/sms_service/index'
         flash('Login successfull!', 'success')
         return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
@@ -191,7 +206,7 @@ def notifications():
         notifications = db.session.query(Notification).all()
     session['last_url'] = url_for('notifications')
     session['login_required'] = False
-    print(notifications)
+    # print(notifications)
     return render_template('notifications.html', users=users, notifications=notifications, title='Notifications')
 
 @app.route('/notifications/add', methods=['GET', 'POST'])
@@ -225,9 +240,13 @@ def notifications_add():
         if not rule:
             errors.append('rule')
             emsg += "Set rule! "
-        if not limit.isnumeric():
+        try:
+            if float(limit):
+                pass
+        except Exception as e:
             errors.append('limit')
             emsg += 'Limit must be numeric! '
+
         if len(errors) == 0:
             user_db = db.session.query(User).filter_by(username=user.username).first()
             user_id = user_db.id
@@ -267,7 +286,7 @@ def notifications_edit(id):
         limitLU = '0'
         for index in range(len(nc)):
             keys = requestJson_load['notificationCores'][index]['notificationCore'+str(index)].items()
-            print(dict(keys))
+            # print(dict(keys))
             if index == 0:
                 pv = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['pv']
                 rule = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['rule']
@@ -313,37 +332,61 @@ def notifications_edit(id):
                     errors.append('rule')
                 if "Set rule! " not in emsg:
                     emsg += "Set rule! "
-            if not limit.isnumeric() and limit:
+            try:
+                if float(limit):
+                    pass
+            except Exception as e:
                 if 'limit' not in errors:
                     errors.append('limit')
                 if 'Limit must be numeric!' not in emsg:
                     emsg += 'Limit must be numeric! '
+            # if not limit.isnumeric() and limit:
+            #     if 'limit' not in errors:
+            #         errors.append('limit')
+            #     if 'Limit must be numeric!' not in emsg:
+            #         emsg += 'Limit must be numeric! '
             if not limit:
                 if 'limit' not in errors:
                     errors.append('limit')
                 if 'Set Limit of' not in emsg:
                     emsg += 'Set Limit of ' + pv + '! '
-            if not limitLL.isnumeric() and limitLL:
+            try:
+                if float(limitLL):
+                    pass
+            except Exception as e:
                 if 'limitLL' not in errors:
                     errors.append('limitLL')
                 if 'Limit LL must be numeric!' not in emsg:
                     emsg += 'Limit LL must be numeric! '
+            # if not limitLL.isnumeric() and limitLL:
+            #     if 'limitLL' not in errors:
+            #         errors.append('limitLL')
+            #     if 'Limit LL must be numeric!' not in emsg:
+            #         emsg += 'Limit LL must be numeric! '
             if not limitLL:
                 if 'limitLL' not in errors:
                     errors.append('limitLL')
                 if 'Set Limit LL! ' not in emsg:
                     emsg += 'Set Limit LL of ' + pv + '! '
-            if not limitLU.isnumeric() and limitLU:
+            try:
+                if float(limitLU):
+                    pass
+            except Exception as e:
                 if 'limitLU' not in errors:
                     errors.append('limitLU')
                 if 'Limit LU must be numeric!' not in emsg:
                     emsg += 'Limit LU must be numeric! '
+            # if not limitLU.isnumeric() and limitLU:
+            #     if 'limitLU' not in errors:
+            #         errors.append('limitLU')
+            #     if 'Limit LU must be numeric!' not in emsg:
+            #         emsg += 'Limit LU must be numeric! '
             if not limitLU:
                 if 'limitLU' not in errors:
                     errors.append('limitLU')
                 if 'Set Limit LU of' not in emsg:
                     emsg += 'Set Limit LU of' + pv + '! '
-            # print(limit)
+            # print(type(limit))
             # print(limitLL)
             # print(limitLU)
             # print(index)
@@ -448,19 +491,19 @@ def rules_edit(id):
 
 # Many PVs
 # {
-# 'created': '2022-11-15 17:02', 'expiration': '2022-11-01 10:55', 'interval': '61', 'persistence': 'YES', 
-# 'notificationCores': 
+# 'created': '2022-11-15 17:02', 'expiration': '2022-11-01 10:55', 'interval': '61', 'persistence': 'YES',
+# 'notificationCores':
 # [
-# {'notificationCore0': {'pv': '^LA-VA:H1VGC-02:RdPrs-2$', 'rule': 'pv < L', 'limit': '1e-8', 'subrule': 'OR'}}, 
-# {'notificationCore1': {'pv1': '^LA-VA:H1VGC-03:RdPrs-1$', 'rule1': 'pv > L', 'limit1': '1e-8', 'subrule1': 'OR'}}, 
+# {'notificationCore0': {'pv': '^LA-VA:H1VGC-02:RdPrs-2$', 'rule': 'pv < L', 'limit': '1e-8', 'subrule': 'OR'}},
+# {'notificationCore1': {'pv1': '^LA-VA:H1VGC-03:RdPrs-1$', 'rule1': 'pv > L', 'limit1': '1e-8', 'subrule1': 'OR'}},
 # {'notificationCore2': {'pv2': '^LA-VA:H1VGC-02:RdPrs-1$', 'rule2': 'pv > L', 'limit2': '1e-8', 'subrule2': ''}}
 # ]
 # }
 
 # One PV
 # {
-# 'created': '2022-11-15 17:05', 'expiration': '2022-11-30 14:00', 'interval': '59', 'persistence': 'YES', 
-# 'notificationCores': 
+# 'created': '2022-11-15 17:05', 'expiration': '2022-11-30 14:00', 'interval': '59', 'persistence': 'YES',
+# 'notificationCores':
 # [
 # {'notificationCore0': {'pv': '^([T][S])(.+VA-CCG.+Pressure-Mon)$', 'rule': 'pv > L', 'limit': '1e-8', 'subrule': ''}}
 # ]

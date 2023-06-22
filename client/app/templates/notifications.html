@@ -3,12 +3,13 @@
 
 
 {% block app_content %}
-    <script src="{{ url_for('static', filename='js/nService.js') }}"></script> 
+    <script src="{{ url_for('static', filename='js/nService.js') }}"></script>
     <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800">{%if not current_user.is_authenticated %}
         All Notifications{% else %}Your Configured Notifications {% endif %} </h1>
-    <p class="mb-4">Notifications are sent to the configurated person contact whenever 
+    <p class="mb-4">Notifications are sent to the configurated person contact whenever
         the Rule evaluates to True.</p>
+    <script src="https://cdn.jsdelivr.net/npm/table-to-json@1.0.0/lib/jquery.tabletojson.min.js"></script>
     <script>
         window.onload = function(){
         '{%for notification in notifications%}'
@@ -36,6 +37,7 @@
             '{%endif%}'
             var n = '{{notification.notification}}';
             obj = toJson(n);
+            // console.log(obj)
             nCores = obj.notificationCores;
             var len = obj.notificationCores.length;
             // console.log('len', len)
@@ -50,24 +52,27 @@
                 id.innerHTML = '{{notification.id}}';
                 // console.log(obj)
                 expiration.innerHTML = obj.expiration;
-                pv.innerHTML = obj.notificationCores[len-1].notificationCore0.pv;
-                rule.innerHTML = obj.notificationCores[len-1].notificationCore0.rule;
+                pv.innerHTML = obj.notificationCores[0].notificationCore0.pv;
+                rule.innerHTML = obj.notificationCores[0].notificationCore0.rule;
                 // console.log('notificationCores', obj.notificationCores[0]);
                 // console.log('rule', rule)
                 // console.log('obj', obj.notificationCores[0].notificationCore0.rule)
+                limit.innerHTML = obj.notificationCores[0].notificationCore0.limit
                 rule_ = obj.notificationCores[0].notificationCore0.rule;
                 subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
                 interval.innerHTML = obj.interval;
                 persistence.innerHTML = obj.persistence;
+                // console.log('limit', limit)
                 '{%else%}'
                 // console.log(obj)
                 id.innerHTML = '{{notification.id}}';
                 expiration.innerHTML = obj.expiration;
                 pv.innerHTML = obj.notificationCores[0].notificationCore0.pv;
                 // console.log('notificationCores', obj.notificationCores[0]);
+                rule.innerHTML = obj.notificationCores[0].notificationCore0.rule
                 rule_ = obj.notificationCores[0].notificationCore0.rule;
                 if (rule_.includes('LL')){
-                    limit.innerHTML += 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
+                    limit.innerHTML = 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
                         'LU = ' + obj.notificationCores[0].notificationCore0['limitLU'] + '<br/>';
                     }
                 else{
@@ -163,7 +168,7 @@
         '{%endfor%}'
         //console.log(limit)
         }
-        
+
     </script>
     <!-- DataTales Example -->
     <form action="" action='{{url_for("notifications")}}' method="POST" style="display:inline-block;overflow-x:auto;">
@@ -172,7 +177,6 @@
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered table-sm text-left text-nowrap" id="dataTable" cellspacing="0">
                         <thead class="thead-light">
-                            <tr>
                                 {% if current_user.is_authenticated %}
                                 <th>Select</th>
                                 {%endif%}
@@ -219,4 +223,9 @@
     </form>
     <br>
     </br>
+    <script type="text/javascript">
+        var tableToJson = $('#dataTable').tableToJSON();
+        var sendingData = JSON.stringify (tableToJson);
+        //console.log(tableToJson)
+    </script>
 {% endblock %}

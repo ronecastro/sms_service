@@ -1,4 +1,4 @@
-from epics import caget, caget_many
+from epics import caget, caget_many, cainfo
 import json, re, pickle
 from classes import empty_class
 from iofunctions import tcpsock_client, fromcfg
@@ -138,3 +138,34 @@ def notification2server(pvlist, pvpool):
     else:
         return 'error on tcpsock_client:', ans
 
+def get_enum_list(pv):
+    ans3 = ''
+    try:
+        ans = cainfo(pv, print_out=False, timeout=2)
+        if ans is not '' and ans is not None and 'enum strings:' in ans:
+            ans2 = (ans.split('enum strings:')[-1])
+            ans3 = ans2.split('\n')[1:-2]
+        else:
+            return
+    except Exception as e:
+        #print('e', e)
+        return
+    aux = []
+    if ans3 is not '' and ans3 is not None:
+        for element in ans3:
+            aux3 = element.strip()
+            aux4 = aux3.replace(' ', '')
+            aux5 = aux4.replace('\n', '')
+            aux6 = aux5.replace('\t', '')
+            aux7 = aux6.replace('\r', '')
+            aux8 = aux7.replace('=', ' = ')
+            aux.append(aux8)
+        aux = '\n'.join(aux)
+        if type(aux) == str:
+            return aux
+        else:
+            return None
+    else:
+        return None
+
+print(get_enum_list('SI-13C4:DI-DCCT:Current-Mon'))

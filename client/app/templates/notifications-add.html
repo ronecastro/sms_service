@@ -6,7 +6,7 @@
 <p></p>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/nService.js') }}"></script> 
+<script src="{{ url_for('static', filename='js/nService.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.min.css') }}">
 
 <div class="container-fluid" style="padding-left:0px;padding-right:0px;">
@@ -15,7 +15,7 @@
             <label class="col-sm-12 col-form-label">Expiraton date:</label>
         </div>
         <div class="col-sm-2">
-            <input type="text" class="form-control datetimepicker-input" id="datetimepicker5" 
+            <input type="text" class="form-control datetimepicker-input" id="datetimepicker5"
                 data-toggle="datetimepicker" data-target="#datetimepicker5">
         </div>
         <script type="text/javascript">
@@ -23,7 +23,7 @@
                 $('#datetimepicker5').datetimepicker();
             });
             $('#datetimepicker5').datetimepicker({
-            format: 'YYYY-MM-DD HH:mm', 
+            format: 'YYYY-MM-DD HH:mm',
             useCurrent: false,
             showTodayButton: true,
             showClear: true,
@@ -40,13 +40,13 @@
                 clear: "fa fa-trash" }
             });
         </script>
-        <script>
+        <!-- <script>
             $(function() {
                 $("[id^=pv]").autocomplete({
                     source:function(request, response) {
                         $.getJSON("{{url_for('autocomplete')}}",{
                             q: request.term, // in flask, "q" will be the argument to look for using request.args
-                        }, 
+                        },
                         function(data) {
                             response(data.matching_results.slice(0,500)); // matching_results from jsonify
                         });
@@ -55,7 +55,31 @@
                     delay:100,
                 });
             })
+        </script> -->
+        <script>
+            $(function(){
+                $(document).on('click', "[id^='pv']", function(e){
+                    $(this).autocomplete({
+                        source:function(request,response){
+                            $.getJSON("{{url_for('autocomplete')}}",{
+                                q: request.term, // in flask, "q" will be the argument to look for using request.args
+                                },
+                            function(data) {
+                                response(data.matching_results.slice(0,500)); // matching_results from jsonify
+                                }
+                            );
+                        }
+                    })
+                });
+            });
         </script>
+        <!-- <script>
+            $(function() {
+                $(document).on('focusin', this, function() {
+
+                });
+            })
+        </script> -->
         <div class="col-sm-1.5">
             <label class="col-sm-12 col-form-label">Interval(minutes):</label>
         </div>
@@ -85,7 +109,7 @@
                                 <label class="col-form-label">PV:</label>
                             </div>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="pv" show="on">
+                                <input type="text" class="form-control ui-autocomplete-input" id="pv" show="on">
                             </div>
                         </div>
                         <div class="col-sm-auto mr-1 row">
@@ -109,7 +133,7 @@
                                 <label class="col-form-label">Limit (L):</label>
                             </div>
                             <div class="col-sm-8">
-                                <input class="form-control col-sm-12" type="number" id="limit" show="on">
+                                <input class="form-control col-sm-12" type="number" id="limit" show="on" onfocus="gethint(this)">
                             </div>
                         </div>
                         <div class="col-sm-3 mr-1 row" id="limitComposite" style="display: none;">
@@ -125,7 +149,7 @@
                             <div class="col-sm-5">
                                 <input class="form-control col-sm-12" type="number" id="limitLU" show="off">
                             </div>
-                        </div> 
+                        </div>
                         <div class="col-sm-auto mr-1 row">
                             <div class="">
                                 <label class="col-form-label">Subrule:</label>
@@ -147,7 +171,7 @@
                 onClick="submitForm(this, 'add')" >Submit</button>
         </span>
         <span>
-            <button class="btn btn-primary btn-user" type="cancel" name="action" 
+            <button class="btn btn-primary btn-user" type="cancel" name="action"
                 value="cancel" onclick="submitForm(this, 'cancel')">Cancel</button>
         </span>
     </form>
