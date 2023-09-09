@@ -174,7 +174,7 @@ class Modem:
             return ans
 
     #Operations Group number
-    def sendsms(self, mode='direct', number='19997397443', msg='SMS message test.', clearmemo=True):
+    def sendsms(self, mode='direct', number='+5519997397443', msg='SMS message test.', clearmemo=True):
         if mode == 'direct':
             cmd = 'AT+CMGS=' + '"' + number + '"' + '\r'
             self.send_to_modem(cmd)
@@ -184,7 +184,10 @@ class Modem:
                 self.send_to_modem(cmd)
                 time.sleep(5)
                 ans = self.get_answer()
-            return ans
+            if msg and 'OK' in ans:
+                return 'ok'
+            else:
+                return 'nOk'
 
         elif mode == 'indirect':
             cmd = 'AT+CMGW=' + '"' + number + '"' + '\r'
@@ -214,7 +217,7 @@ class Modem:
     def closeconnection(self):
         self.serial_connection.close()
 
-m = Modem(debug=True)
-m.initialize()
-m.sendsms()
-m.closeconnection()
+# m = Modem(debug=False)
+# m.initialize()
+# m.sendsms(mode='direct')
+# m.closeconnection()

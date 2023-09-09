@@ -21,9 +21,9 @@ def on_new_client(sock, connection, client_address, queue):
             ip3 = fromcfg("IP", "client_ip3")
             ip4 = fromcfg("IP", "client_ip4")
             data = ''
-            if (client_address[0] == ip1 or 
-                client_address[0] == ip2 or 
-                client_address[0] == ip3 or 
+            if (client_address[0] == ip1 or
+                client_address[0] == ip2 or
+                client_address[0] == ip3 or
                 client_address[0] == ip4):
                 data = sock.receive_data(connection, echo=True)
                 # print('data', data)
@@ -42,8 +42,8 @@ def on_new_client(sock, connection, client_address, queue):
     _exit(0)
 
 def init():
-    ip = str(fromcfg("ADDRESS", "ip"))
-    port = int(fromcfg("ADDRESS", "port"))
+    ip = str(fromcfg("SERVER", "ip"))
+    port = int(fromcfg("SERVER", "port"))
     if 'error' in (ip or port):
         raise Exception('error on ip or port')
     server_address = (ip, port)
@@ -60,9 +60,9 @@ def server(sock, queue, exit):
         if exit.value:
             break
         else:
-            print('connection started')
+            # print('connection started')
             connection, client_address = sock.accept_connection()
-            print('connection accepted')
+            # print('connection accepted')
             try:
                 p = Process(name='notificationserver-spawn', target=on_new_client, \
                     args=(sock, connection, client_address, queue))
@@ -92,6 +92,10 @@ def watcherseye(queue, exit):
                 phone = data[0][1]
                 email = data[0][2]
                 msg = data[1]
+                print('owner', owner)
+                print('phone', phone)
+                print('email', email)
+                print('msg', msg)
                 # m = Modem()
                 # m.initialize()
                 # m.sendsms(number=phone, msg=msg)

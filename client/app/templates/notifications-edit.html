@@ -147,20 +147,21 @@
             });
         </script>
         <script>
-            $(function() {
-                $("[id^=pv]").autocomplete({
-                    source:function(request, response) {
-                        $.getJSON("{{url_for('autocomplete')}}",{
-                            q: request.term, // in flask, "q" will be the argument to look for using request.args
-                        },
-                        function(data) {
-                            response(data.matching_results.slice(0,500)); // matching_results from jsonify
-                        });
-                    },
-                    minLength: 2,
-                    delay:100,
+            $(function(){
+                $(document).on('click', "[id^='pv']", function(e){
+                    $(this).autocomplete({
+                        source:function(request,response){
+                            $.getJSON("{{url_for('autocomplete')}}",{
+                                q: request.term, // in flask, "q" will be the argument to look for using request.args
+                                },
+                            function(data) {
+                                response(data.matching_results.slice(0,500)); // matching_results from jsonify
+                                }
+                            );
+                        }
+                    })
                 });
-            })
+            });
         </script>
         <div class="col-sm-1.5">
             <label class="col-sm-12 col-form-label">Interval(minutes):</label>
@@ -216,8 +217,7 @@
                                 <label class="col-form-label">Limit (L):</label>
                             </div>
                             <div class="col-sm-8">
-                                <input class="form-control col-sm-12" type="text" id="limit"
-                                name='limit' autocomplete="off" show="on">
+                                <input class="form-control col-sm-12" type="text" id="limit" name='limit' autocomplete="off" show="on" onfocus="gethint(this)">
                             </div>
                         </div>
                         <div class="col-sm-3 mr-1 row" id="limitComposite" style="display: none;">

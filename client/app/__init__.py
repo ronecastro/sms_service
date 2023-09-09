@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_bootstrap import Bootstrap
+# from flask_bootstrap import Bootstrap
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -32,7 +32,7 @@ app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=p)
 app.permanent_session_lifetime = 600
 
 from app import routes, models
-bootstrap = Bootstrap(app)
+# bootstrap = Bootstrap(app)
 
 with app.app_context():
     if db.engine.url.drivername == 'sqlite':

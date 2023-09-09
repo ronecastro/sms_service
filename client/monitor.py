@@ -1,5 +1,5 @@
 import json
-from app import app, db
+from app import db
 from app.models import User, Notification, Rule
 from datetime import datetime, timedelta
 from classes import notification_class, user_class, empty_class
@@ -241,4 +241,4 @@ exclude = ['iteration',\
             'testpv',\
             'pvlist',\
             '']
-evaluate(debug=False)
+evaluate(debug=True)

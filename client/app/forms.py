@@ -55,7 +55,7 @@ class RegistrationForm(FlaskForm):
             else:
                 #print("field and user are equal")
                 pass
-    
+
     def validate_phone(self, field):
         if not self.custom_validation:
             print("phone validation")
@@ -90,7 +90,7 @@ class RuleForm(FlaskForm):
             if rule_modified is not None:
                 if rule_existent.id != rule_modified.id:
                     raise ValidationError('Rule already in use!')
-            
+
 class NotificationForm(FlaskForm):
     expiration = StringField('Expiration', validators=[DataRequired()])
     pv = StringField('PV', validators=[DataRequired()])
@@ -101,4 +101,3 @@ class NotificationForm(FlaskForm):
     interval = StringField('Interval', validators=[Optional()])
     submit = SubmitField('Add')
     cancel = SubmitField('Cancel', render_kw={'formnovalidate': True})
-

@@ -2,6 +2,7 @@ from epics import caget, caget_many, cainfo
 import json, re, pickle
 from classes import empty_class
 from iofunctions import tcpsock_client, fromcfg
+from modem_usb import Modem
 
 def testpv(notificationCore, pool, user, fullpvlist): #test pv using rule and limits
     pvlist = []
@@ -84,7 +85,7 @@ def makepvpool(notifications_raw, fullpvlist): #buid dict with pv : value
     #print('vals_', vals_)
     return pvpool
 
-def notification2server(pvlist, pvpool):
+def notification2server(pvlist, pvpool, local=True):
     header = 'WARNING!\n\r'
     body = ''
     sizetrue = 0
@@ -129,14 +130,23 @@ def notification2server(pvlist, pvpool):
         body = 'Many PVs reached their limits!\n\r'
         body += 'First PV: ' + pv_ + '\n\r'
     aux = (user.username, user.phone, user.email)
-    msg = [aux, header + body]
-    ip = str(fromcfg('ADDRESS', 'ip'))
-    port = int(fromcfg('ADDRESS', 'port'))
-    ans = tcpsock_client(msg, ip, port)
-    if ans == 'ok':
-        return 'ok'
+    msg = header + body
+    msg_full = [aux, header + body]
+    if local is True:
+        # pass
+        m = Modem(debug=False)
+        m.initialize()
+        ans = m.sendsms(number=user.phone, msg=msg)
+        m.closeconnection()
+        return ans
     else:
-        return 'error on tcpsock_client:', ans
+        ip = str(fromcfg('SERVER', 'ip'))
+        port = int(fromcfg('SERVER', 'port'))
+        ans = tcpsock_client(msg_full, ip, port)
+        if ans == 'ok':
+            return 'ok'
+        else:
+            return 'error on tcpsock_client:', ans
 
 def get_enum_list(pv):
     ans3 = ''
@@ -168,4 +178,4 @@ def get_enum_list(pv):
     else:
         return None
 
-print(get_enum_list('SI-13C4:DI-DCCT:Current-Mon'))
+# print(get_enum_list('SI-13C4:DI-DCCT:Current-Mon'))
