@@ -57,8 +57,16 @@
                 // console.log('notificationCores', obj.notificationCores[0]);
                 // console.log('rule', rule)
                 // console.log('obj', obj.notificationCores[0].notificationCore0.rule)
-                limit.innerHTML = obj.notificationCores[0].notificationCore0.limit
+                // limit.innerHTML = obj.notificationCores[0].notificationCore0.limit
                 rule_ = obj.notificationCores[0].notificationCore0.rule;
+                if (rule_.includes('LL')){
+                    limit.innerHTML = 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
+                        'LU = ' + obj.notificationCores[0].notificationCore0['limitLU'] + '<br/>';
+                    }
+                else{
+                    limit.innerHTML = 'L = ' + obj.notificationCores[0].notificationCore0.limit;
+                    }
+                // console.log(rule_)
                 subrule.innerHTML = obj.notificationCores[0].notificationCore0.subrule;
                 interval.innerHTML = obj.interval;
                 persistence.innerHTML = obj.persistence;
@@ -71,6 +79,7 @@
                 // console.log('notificationCores', obj.notificationCores[0]);
                 rule.innerHTML = obj.notificationCores[0].notificationCore0.rule
                 rule_ = obj.notificationCores[0].notificationCore0.rule;
+                limit.innerHTML = "test"
                 if (rule_.includes('LL')){
                     limit.innerHTML = 'LL = ' + obj.notificationCores[0].notificationCore0['limitLL'] + ' // ' +
                         'LU = ' + obj.notificationCores[0].notificationCore0['limitLU'] + '<br/>';

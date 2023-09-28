@@ -61,14 +61,20 @@ def profile_edit(username):
     if request.method == "POST":
         if form.cancel.data:
             return redirect(url_for('profile', username=user.username))
-        if form.validate():
-            user.email = form.email.data
-            user.phone = form.phone.data
-            db.session.commit()
-            flash("Successful editing!", "success")
-            return render_template('profile.html', username=user.username, user=user, title='Profile')
+        phone = form.phone.data
+        pattern = "^[+][\d]+$"
+        if re.match(pattern, phone):
+            if form.validate():
+                user.email = form.email.data
+                user.phone = form.phone.data
+                db.session.commit()
+                flash("Successful editing!", "success")
+                return render_template('profile.html', username=user.username, user=user, title='Profile')
+            else:
+                pass
         else:
-            pass
+            flash('Please use phone only with "+" sign and numbers!', 'warning')
+            return redirect(request.url)
     session['last_url'] = url_for('profile_edit', username=username)
     session['login_required'] = True
     return render_template('profile-edit.html', form=form, user=user, title='Edit Profile')
@@ -107,7 +113,10 @@ def login_modal():
             login_user(user, remember=form.remember_me.data)
             flash('Login successfull!', 'success')
             if session.get('last_url') != None:
-                return redirect(url_for(session['last_url'].rsplit('/')[-1]))
+                try:
+                    return redirect(url_for(session['last_url'].rsplit('/')[-1]))
+                except Exception as e:
+                    return redirect(url_for('index'))
             else:
                 return redirect(url_for('index'))
         else:
@@ -217,45 +226,128 @@ def notifications_add():
     user = current_user
     emsg = ''
     if request.method == "POST":
+        action = request.form
         requestJson = json.dumps(request.get_json(force=True))
         requestJson_load = json.loads(requestJson)
-        # print('requestJson_load', requestJson_load)
+        # print(requestJson_load)
         expiration = requestJson_load['expiration']
         interval = requestJson_load['interval']
-        pv = requestJson_load['notificationCores'][0]['notificationCore0']['pv']
-        rule = requestJson_load['notificationCores'][0]['notificationCore0']['rule']
-        limit = requestJson_load['notificationCores'][0]['notificationCore0']['limit']
-        if not expiration:
-            errors.append('expiration')
-            emsg += 'Set expiration! '
-        if not interval.isnumeric:
-            errors.append('interval')
-            emsg += 'Interval must be numeric! '
-        if int(interval) < 10:
-            errors.append('interval')
-            emsg += 'Interval minimum is 10 minutes! '
-        if not pv:
-            errors.append('pv')
-            emsg += 'Set PV! '
-        if not rule:
-            errors.append('rule')
-            emsg += "Set rule! "
-        try:
-            if float(limit):
-                pass
-        except Exception as e:
-            errors.append('limit')
-            emsg += 'Limit must be numeric! '
-
+        nc = requestJson_load['notificationCores']
+        limit = '0'
+        limitLL = '0'
+        limitLU = '0'
+        for index in range(len(nc)):
+            keys = requestJson_load['notificationCores'][index]['notificationCore'+str(index)].items()
+            # print(dict(keys))
+            if index == 0:
+                pv = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['pv']
+                rule = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['rule']
+                if 'limitLL' in dict(keys):
+                    limitLL = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['limitLL']
+                if 'limitLU' in dict(keys):
+                    limitLU = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['limitLU']
+                else:
+                    limit = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['limit']
+            else:
+                pv = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['pv'+str(index)]
+                rule = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['rule'+str(index)]
+                aux = 'limitLL' + str(index)
+                if aux in dict(keys):
+                    limitLL = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['limitLL'+str(index)]
+                aux = 'limitLU' + str(index)
+                if aux in dict(keys):
+                    limitLU = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['limitLU'+str(index)]
+                else:
+                    limit = requestJson_load['notificationCores'][index]['notificationCore'+str(index)]['limit'+str(index)]
+            if not expiration:
+                if 'expiration' not in errors:
+                    errors.append('expiration')
+                if 'Set expiration! ' not in emsg:
+                    emsg += 'Set expiration! '
+            if not interval.isnumeric:
+                if 'interval' not in errors:
+                    errors.append('interval')
+                if 'Interval must be numeric! ' not in emsg:
+                    emsg += 'Interval must be numeric! '
+            if int(interval) < 10:
+                if 'interval10' not in errors:
+                    errors.append('interval10')
+                if 'Interval minimum is 10 minutes! ' not in emsg:
+                    emsg += 'Interval minimum is 10 minutes! '
+            if not pv:
+                if 'pv' not in errors:
+                    errors.append('pv')
+                if 'Set PV! ' not in emsg:
+                    emsg += 'Set PV! '
+            if not rule:
+                if 'rule' not in errors:
+                    errors.append('rule')
+                if "Set rule! " not in emsg:
+                    emsg += "Set rule! "
+            try:
+                if float(limit):
+                    pass
+            except Exception as e:
+                if 'limit' not in errors:
+                    errors.append('limit')
+                if 'Limit must be numeric!' not in emsg:
+                    emsg += 'Limit must be numeric! '
+            # if not limit.isnumeric() and limit:
+            #     if 'limit' not in errors:
+            #         errors.append('limit')
+            #     if 'Limit must be numeric!' not in emsg:
+            #         emsg += 'Limit must be numeric! '
+            if not limit:
+                if 'limit' not in errors:
+                    errors.append('limit')
+                if 'Set Limit of' not in emsg:
+                    emsg += 'Set Limit of ' + pv + '! '
+            try:
+                if float(limitLL):
+                    pass
+            except Exception as e:
+                if 'limitLL' not in errors:
+                    errors.append('limitLL')
+                if 'Limit LL must be numeric!' not in emsg:
+                    emsg += 'Limit LL must be numeric! '
+            # if not limitLL.isnumeric() and limitLL:
+            #     if 'limitLL' not in errors:
+            #         errors.append('limitLL')
+            #     if 'Limit LL must be numeric!' not in emsg:
+            #         emsg += 'Limit LL must be numeric! '
+            if not limitLL:
+                if 'limitLL' not in errors:
+                    errors.append('limitLL')
+                if 'Set Limit LL! ' not in emsg:
+                    emsg += 'Set Limit LL of ' + pv + '! '
+            try:
+                if float(limitLU):
+                    pass
+            except Exception as e:
+                if 'limitLU' not in errors:
+                    errors.append('limitLU')
+                if 'Limit LU must be numeric!' not in emsg:
+                    emsg += 'Limit LU must be numeric! '
+            # if not limitLU.isnumeric() and limitLU:
+            #     if 'limitLU' not in errors:
+            #         errors.append('limitLU')
+            #     if 'Limit LU must be numeric!' not in emsg:
+            #         emsg += 'Limit LU must be numeric! '
+            if not limitLU:
+                if 'limitLU' not in errors:
+                    errors.append('limitLU')
+                if 'Set Limit LU of' not in emsg:
+                    emsg += 'Set Limit LU of' + pv + '! '
+            # print(type(limit))
+            # print(limitLL)
+            # print(limitLU)
+            # print(index)
         if len(errors) == 0:
             user_db = db.session.query(User).filter_by(username=user.username).first()
             user_id = user_db.id
-            # print('user_id:\n\r', user_id)
             notification = Notification(
                 user_id = user_id,
                 notification=requestJson)
-            # print('user:\n\r', user)
-            # print('notification:\n\r', notification)
             db.session.add(notification)
             db.session.commit()
             flash('Notification added!', 'success')

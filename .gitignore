@@ -9,6 +9,8 @@ client/app/__pycache__
 client/app/test_script.py
 client/app/db/db/get_old_db.py
 client/app/db/db/notifications.db
+client/app/credentials.json
+client/app/token.json
 
 server/__pycache__
 server/*.pyc

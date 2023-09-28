@@ -14,9 +14,9 @@
                     </div>
                     <div class="form-group col-sm-3 has-validation">
                         <div class="col-sm-12">
-                        {{ form.email(class_="form-control form-control-user" + 
+                        {{ form.email(class_="form-control form-control-user" +
                             (" is-invalid" if form.email.errors else ""), id="inputValEmail", description='{{user.username}}',
-                            default="{{user.email}}", size=32, **{"aria-describedby": 
+                            default="{{user.email}}", size=32, **{"aria-describedby":
                             "inputValRule", "required": ""}) }}
                         </div>
                         {% for error in form.email.errors %}
@@ -30,9 +30,9 @@
                     </div>
                     <div class="form-group col-sm-3 has-validation">
                         <div class="col-sm-12">
-                        {{ form.phone(class_="form-control form-control-user" + 
+                        {{ form.phone(class_="form-control form-control-user" +
                             (" is-invalid" if form.phone.errors else ""), id="inputValPhone",
-                            default="{{user.phone}}", size=32, **{"aria-describedby": 
+                            default="{{user.phone}}", size=32, **{"aria-describedby":
                             "inputValDescription", "required": ""}) }}
                         </div>
                         {% for error in form.phone.errors %}

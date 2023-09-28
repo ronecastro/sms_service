@@ -58,11 +58,11 @@ class RegistrationForm(FlaskForm):
 
     def validate_phone(self, field):
         if not self.custom_validation:
-            print("phone validation")
+            # print("phone validation")
             try:
                 if is_valid_number(parse(str(field))):
-                    print("phone valid")
-                    print(field.data)
+                    # print("phone valid")
+                    # print(field.data)
                     pass
                 else:
                     raise ValidationError('Phone number not valid.')

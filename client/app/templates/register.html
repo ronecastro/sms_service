@@ -26,10 +26,10 @@
     <script type='text/javascript'>
         $(document).ready(function($){
             var phones = [{ "mask": "+55 ## #-####-####"}, { "mask": "+55 ## #-####-####"}];
-            $('#inputValPhone').inputmask({ 
-                mask: phones, 
-                greedy: false, 
-                definitions: { '#': { validator: "[0-9]", cardinality: 1}} 
+            $('#inputValPhone').inputmask({
+                mask: phones,
+                greedy: false,
+                definitions: { '#': { validator: "[0-9]", cardinality: 1}}
                 });
             $('#inputValUsername').focus()
             });
@@ -54,9 +54,9 @@
                                         {{ form.hidden_tag() }}
                                         <div class="form-group">
                                             <div class="form-group mb-0">
-                                                {{ form.username(class="form-control form-control-user" + 
-                                                    (" is-invalid" if form.username.errors else ""), placeholder="Username", 
-                                                    id="inputValUsername", size=32, **{"aria-describedby": "inputValUsername", 
+                                                {{ form.username(class="form-control form-control-user" +
+                                                    (" is-invalid" if form.username.errors else ""), placeholder="Username",
+                                                    id="inputValUsername", size=32, **{"aria-describedby": "inputValUsername",
                                                     "required": ""}) }}
                                             </div>
                                             <div class="mb-3">
@@ -67,9 +67,9 @@
                                                 {% endfor %}
                                             </div>
                                             <div class="form-group mb-0">
-                                                {{ form.email(class="form-control form-control-user" + 
-                                                    (" is-invalid" if form.email.errors else ""), placeholder="Email", 
-                                                    id="inputValEmail", size=32, **{"aria-describedby": "inputValEmail", 
+                                                {{ form.email(class="form-control form-control-user" +
+                                                    (" is-invalid" if form.email.errors else ""), placeholder="Email",
+                                                    id="inputValEmail", size=32, **{"aria-describedby": "inputValEmail",
                                                     "required": ""}) }}
                                             </div>
                                             <div class="mb-3">
@@ -82,9 +82,9 @@
                                             <div class="form-group row mb-0 mx-0">
                                                 <div class="form-group col-sm-6 px-0 mb-0">
                                                     <div class="col-sm-12 pl-0 pr-1">
-                                                        {{ form.password(class="form-control form-control-user" + 
-                                                            (" is-invalid" if form.password.errors else ""), placeholder="Password", 
-                                                            id="inputValPassword", size=32, **{"aria-describedby": "inputValPassword", 
+                                                        {{ form.password(class="form-control form-control-user" +
+                                                            (" is-invalid" if form.password.errors else ""), placeholder="Password",
+                                                            id="inputValPassword", size=32, **{"aria-describedby": "inputValPassword",
                                                             "required": ""}) }}
                                                     </div>
                                                     <div class="mb-3">
@@ -97,9 +97,9 @@
                                                 </div>
                                                 <div class="form-group col-sm-6 px-0 mb-0">
                                                     <div class="col-sm-12 pl-1 pr-0">
-                                                        {{ form.password2(class="form-control form-control-user" + 
-                                                            (" is-invalid" if form.password2.errors else ""), placeholder="Repeat Password", 
-                                                            id="inputValPassword2", size=32, **{"aria-describedby": "inputValPassword2", 
+                                                        {{ form.password2(class="form-control form-control-user" +
+                                                            (" is-invalid" if form.password2.errors else ""), placeholder="Repeat Password",
+                                                            id="inputValPassword2", size=32, **{"aria-describedby": "inputValPassword2",
                                                             "required": ""}) }}
                                                     </div>
                                                     <div class="mb-3 pl-1">
@@ -112,9 +112,9 @@
                                                 </div>
                                             </div>
                                             <div class="form-group mb-0">
-                                                {{ form.phone(class="form-control form-control-user inputValPhone" + 
-                                                    (" is-invalid" if form.phone.errors else ""), placeholder="Phone Number", 
-                                                    id="inputValPhone", size=32, type="", **{"aria-describedby": "inputValPhone", 
+                                                {{ form.phone(class="form-control form-control-user inputValPhone" +
+                                                    (" is-invalid" if form.phone.errors else ""), placeholder="Phone Number",
+                                                    id="inputValPhone", size=32, type="", **{"aria-describedby": "inputValPhone",
                                                     "required": ""}) }}
                                             </div>
                                             <div class="mb-3">
@@ -129,7 +129,7 @@
                                     </form>
                                     <hr>
                                     <div class="text-center">
-                                        <a class="small" href="{{url_for('forgot')}}">Forgot Password?</a>
+                                        <!-- <a class="small" href="{{url_for('forgot')}}">Forgot Password?</a> -->
                                     </div>
                                     <div class="text-center">
                                         <a class="small" href="{{url_for('login')}}">Already have an account? Login!</a>
