@@ -11,6 +11,9 @@ client/app/db/db/get_old_db.py
 client/app/db/db/notifications.db
 client/app/credentials.json
 client/app/token.json
+client/app/quickstart.py
+client/app/send_email.py
+client/app/create_draft.py
 
 server/__pycache__
 server/*.pyc
