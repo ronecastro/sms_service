@@ -14,6 +14,7 @@ client/app/token.json
 client/app/quickstart.py
 client/app/send_email.py
 client/app/create_draft.py
+client/app/exemplo_configdb.py
 
 server/__pycache__
 server/*.pyc

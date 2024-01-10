@@ -9,15 +9,22 @@ def testpv(notificationCore, pool, user, fullpvlist): #test pv using rule and li
     truepv = []
     for n in notificationCore.pv: #notificationCore.pv is a list, n is pv name
         pv = (pool[n][0]) #value
+        if pv == None:
+            pv = 0
         rule = notificationCore.rule
         subrule = notificationCore.subrule
+        # rule = rule.replace('pv', str(pv))
         if 'LL' not in rule:
             L = float(notificationCore.limit)
+            # rule = rule.replace('L', str(L))
             #print(pv, rule, L, eval(rule))
         else:
             LL = float(notificationCore.limitLL)
             LU = float(notificationCore.limitLU)
+            # rule = rule.replace('LL', str(LL))
+            # rule = rule.replace('LU', str(LU))
             #print(pv, rule, LL, LU, (eval(rule)))
+        print('rule from eval:', rule)
         if (eval(rule)):
             pvlist.append(n)
             if 'LL' not in rule:
@@ -178,4 +185,4 @@ def get_enum_list(pv):
     else:
         return None
 
-# print(get_enum_list('SI-13C4:DI-DCCT:Current-Mon'))
+# print(get_enum_list('AS-Glob:AP-MachShift:Mode-Sts'))

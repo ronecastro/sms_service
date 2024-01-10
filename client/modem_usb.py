@@ -217,7 +217,7 @@ class Modem:
     def closeconnection(self):
         self.serial_connection.close()
 
-# m = Modem(debug=False)
+# m = Modem(debug=True)
 # m.initialize()
 # m.sendsms(mode='direct')
 # m.closeconnection()
